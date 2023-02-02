@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.24"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Practica_1_EI",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Practica_1_EI::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Practica_1_EI-Debug-675a72fef51e7cb0d641.json",
+					"name" : "Practica_1_EI",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "E:/Escritorio/Universidad/Cuarto a\u00f1o/Segundo cuatri/EI/Practicas/Tokenizador 1/Practica 1/Practica 1 EI/cmake-build-debug",
+		"source" : "E:/Escritorio/Universidad/Cuarto a\u00f1o/Segundo cuatri/EI/Practicas/Tokenizador 1/Practica 1/Practica 1 EI"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 4
+	}
+}
