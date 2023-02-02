@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/andri/CLionProjects/Practica 1 EI/cmake-build-debug"
+			"value" : "c:/Users/andri/CLionProjects/IE/Practica_1/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -575,7 +575,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/andri/CLionProjects/Practica 1 EI/cmake-build-debug/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/andri/CLionProjects/IE/Practica_1/cmake-build-debug/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -647,7 +647,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/andri/CLionProjects/Practica 1 EI"
+			"value" : "C:/Users/andri/CLionProjects/IE/Practica_1"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -659,7 +659,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "C:/Program Files (x86)/Practica_1_EI"
+			"value" : "C:/Program Files (x86)/Practica_1"
 		},
 		{
 			"name" : "CMAKE_LINKER",
@@ -875,7 +875,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "Practica_1_EI"
+			"value" : "Practica_1"
 		},
 		{
 			"name" : "CMAKE_RANLIB",
@@ -1254,7 +1254,7 @@
 			"value" : "FALSE"
 		},
 		{
-			"name" : "Practica_1_EI_BINARY_DIR",
+			"name" : "Practica_1_BINARY_DIR",
 			"properties" : 
 			[
 				{
@@ -1263,10 +1263,10 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/andri/CLionProjects/Practica 1 EI/cmake-build-debug"
+			"value" : "C:/Users/andri/CLionProjects/IE/Practica_1/cmake-build-debug"
 		},
 		{
-			"name" : "Practica_1_EI_IS_TOP_LEVEL",
+			"name" : "Practica_1_IS_TOP_LEVEL",
 			"properties" : 
 			[
 				{
@@ -1278,7 +1278,7 @@
 			"value" : "ON"
 		},
 		{
-			"name" : "Practica_1_EI_SOURCE_DIR",
+			"name" : "Practica_1_SOURCE_DIR",
 			"properties" : 
 			[
 				{
@@ -1287,7 +1287,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/andri/CLionProjects/Practica 1 EI"
+			"value" : "C:/Users/andri/CLionProjects/IE/Practica_1"
 		},
 		{
 			"name" : "_CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED",

@@ -1,7 +1,8 @@
-#ifndef TOKENIZADOR_H
-#define TOKENIZADOR_H
+#ifndef PRACTICA_1_TOKENIZADOR_H
+#define PRACTICA_1_TOKENIZADOR_H
 
 class Tokenizador {
+
     friend ostream& operator<<(ostream&, const Tokenizador&);
     /* cout << “DELIMITADORES: “ << delimiters << “ TRATA CASOS ESPECIALES:
      * “ << casosEspeciales << “ PASAR A MINUSCULAS Y SIN ACENTOS: “ <<
@@ -127,5 +128,4 @@ private:
      * */
 };
 
-
-#endif TOKENIZADOR_H
+#endif PRACTICA_1_TOKENIZADOR_H
