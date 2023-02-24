@@ -2,35 +2,8 @@
 
 using namespace std;
 
-Tokenizador::Tokenizador (string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos){
-    int length = delimitadoresPalabra.length();
-    char token[length];
-    int num = 0;
-    bool repetido = false;
-
-    if(length != 0) {
-        token[num] = delimitadoresPalabra[0];
-        num ++;
-        if(length > 1) {
-            for (int i = 1; i < length; i++) {
-                for (int l = 0; l < i; l++) {
-                    cout<<delimitadoresPalabra[i]<< delimitadoresPalabra[l]<<endl;
-                    if (delimitadoresPalabra[i] == delimitadoresPalabra[l]) {
-                        repetido = true;
-                        break;
-                    }
-                }
-                if(!repetido) {
-                    token[num] = delimitadoresPalabra[i];
-                    num ++;
-                }
-                repetido = false;
-            }
-        }
-    }
-    token[num]='\0';
-
-    delimiters = token;
+Tokenizador::Tokenizador (string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos) {
+    delimiters = QuitarRepeticiones(delimitadoresPalabra);
     casosEspeciales = kcasosEspeciales;
     pasarAminuscSinAcentos = minuscSinAcentos;
 }
@@ -96,9 +69,10 @@ Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) con
     f.close();
     return true;
 }
+
 bool
 Tokenizador::Tokenizar (const string & i) const{
-
+    return Tokenizar(i,i+".tk");
 }
 
 bool
@@ -123,23 +97,23 @@ Tokenizador::TokenizarDirectorio (const string& dirAIndexar) const {
 
 
 void
-Tokenizador::DelimitadoresPalabra(const string& nuevoDelimiters){
-
+Tokenizador::DelimitadoresPalabra (const string& nuevoDelimiters){
+    delimiters = QuitarRepeticiones(nuevoDelimiters);
 }
 
 void
-Tokenizador::AnyadirDelimitadoresPalabra(const string& nuevoDelimiters){
-
+Tokenizador::AnyadirDelimitadoresPalabra (const string& nuevoDelimiters){
+    delimiters = QuitarRepeticiones(delimiters+nuevoDelimiters);
 }
 
 string
-Tokenizador::DelimitadoresPalabra() const{
+Tokenizador::DelimitadoresPalabra () const{
     return delimiters;
 }
 
 void
 Tokenizador::CasosEspeciales (const bool& nuevoCasosEspeciales){
-
+    casosEspeciales = nuevoCasosEspeciales;
 }
 
 bool
@@ -149,10 +123,42 @@ Tokenizador::CasosEspeciales () const{
 
 void
 Tokenizador::PasarAminuscSinAcentos (const bool& nuevoPasarAminuscSinAcentos){
-
+    pasarAminuscSinAcentos = nuevoPasarAminuscSinAcentos;
 }
 
 bool
 Tokenizador::PasarAminuscSinAcentos () const{
     return pasarAminuscSinAcentos;
+}
+
+//Funciones auxiliares
+
+string
+Tokenizador::QuitarRepeticiones(const string& delimitadores) const{
+    int length = delimitadores.length();
+    char token[length];
+    int num = 0;
+    bool repetido = false;
+
+    if(length != 0) {
+        token[num] = delimitadores[0];
+        num ++;
+        if(length > 1) {
+            for (int i = 1; i < length; i++) {
+                for (int l = 0; l < i; l++) {
+                    if (delimitadores[i] == delimitadores[l]) {
+                        repetido = true;
+                        break;
+                    }
+                }
+                if(!repetido) {
+                    token[num] = delimitadores[i];
+                    num ++;
+                }
+                repetido = false;
+            }
+        }
+    }
+    token[num]='\0';
+    return token;
 }
