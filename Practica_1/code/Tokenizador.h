@@ -1,6 +1,18 @@
 #ifndef PRACTICA_1_TOKENIZADOR_H
 #define PRACTICA_1_TOKENIZADOR_H
 
+//necesario en este fichero
+#include <iostream>
+#include <list>
+
+//necesario en tokenizador.cpp
+#include <fstream>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <cstdlib>
+
+using namespace std;
+
 class Tokenizador {
 
     friend ostream& operator<<(ostream&, const Tokenizador&);
@@ -14,7 +26,7 @@ class Tokenizador {
      * */
 
 public:
-    Tokenizador (const string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
+    Tokenizador (string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
     /* Inicializa delimiters a delimitadoresPalabra filtrando que no se
      * introduzcan delimitadores repetidos (de izquierda a derecha, en cuyo
      * caso se eliminarían los que hayan sido repetidos por la derecha);
@@ -95,7 +107,7 @@ public:
     void CasosEspeciales (const bool& nuevoCasosEspeciales);
     // Cambia la variable privada “casosEspeciales”
 
-    bool CasosEspeciales ();
+    bool CasosEspeciales () const;
     // Devuelve el contenido de la variable privada “casosEspeciales”
 
     void PasarAminuscSinAcentos (const bool& nuevoPasarAminuscSinAcentos);
@@ -104,7 +116,7 @@ public:
      * corrección de la práctica se utilizará el formato actual (ISO-8859).
      * */
 
-    bool PasarAminuscSinAcentos ();
+    bool PasarAminuscSinAcentos () const;
     // Devuelve el contenido de la variable privada “pasarAminuscSinAcentos”
 
 private:
@@ -128,4 +140,4 @@ private:
      * */
 };
 
-#endif PRACTICA_1_TOKENIZADOR_H
+#endif /*PRACTICA_1_TOKENIZADOR_H*/
