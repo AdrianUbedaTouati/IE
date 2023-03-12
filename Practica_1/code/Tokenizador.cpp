@@ -59,19 +59,51 @@ Tokenizador::Tokenizar (string& str, list<string>& tokens) const {
 
 void
 Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimitadoresPalabra) const {
+    bool primerToken = true;
+    string token;
     string::size_type primerCaracter = str.find_first_not_of(delimitadoresPalabra,0);
     string::size_type posDelimitador = str.find_first_of(delimitadoresPalabra,primerCaracter);
-    while(posDelimitador != string::npos || primerCaracter != string::npos)
-    {
-        if(!casosEspeciales){
+    while(posDelimitador != string::npos || primerCaracter != string::npos) {
+        if (!casosEspeciales) {
             tokens.push_back(str.substr(primerCaracter, posDelimitador - primerCaracter));
-        }else{
-            tokens.push_back(str.substr(primerCaracter, posDelimitador - primerCaracter));
+        } else {
+            if (primerToken) {
+                token = str.substr(primerCaracter, posDelimitador - primerCaracter);
+            } else {
+                token = str.substr(primerCaracter - 1, posDelimitador - primerCaracter + 1);
+            }
+
+            if (isUrl) {
+                if (primerToken && (token.find("http:") == 0 || token.find("https:") == 0 || token.find("ftp:") == 0)
+                    || (delimitadoresPalabra.find(token[0]) != string::npos && (token.find("http:") == 1
+                    || token.find("https:") == 1 || token.find("ftp:") == 1))) {
+                    cout << "Soy el token" << token << "y soy una url"<<endl;
+                }
+            }else if (isDecimal){
+                if(token[token.size()] == '.' || token[token.size()] == ',' ||token[token.size()] == ' '
+                   || token[0] == '.' || token[0] == ',' ||token[0] == ' ' ){
+                    cout << "Soy el token" << token << "y soy un decimal" << endl;
+                }
+            } else if (posDelimitador == '@') {
+                cout << "Soy el token" << token << "y soy un mail"<<endl;
+            } else if (posDelimitador == '.') {
+                cout << "Soy el token" << token << "y soy un acronimo"<<endl;
+            } else if (posDelimitador == '-') {
+                cout << "Soy el token" << token << "y soy una multipalabea"<<endl;
+            }
+                }
+                //cout << token <<endl;
+                //cout <<  str.substr(primerCaracter == 0 ? 0 : (primerCaracter - 1), posDelimitador - primerCaracter + (primerCaracter == 0 ? 1 : 2))<<endl;
+                // tokens.push_back(str.substr(primerCaracter, posDelimitador - primerCaracter));
+        }
+        if (primerToken) {
+            primerToken = false;
         }
         primerCaracter = str.find_first_not_of(delimitadoresPalabra, posDelimitador);
         posDelimitador = str.find_first_of(delimitadoresPalabra, primerCaracter);
     }
 }
+
 
 void
 Tokenizador::PasarAminuscSinAcentosFun(string& str)const{
@@ -305,24 +337,15 @@ Tokenizador::PreparacionDelimitadores(const string& delimitadores){
 
 void
 Tokenizador::PosiblesCasosEspeciales (string delimitadores) {
+    isDecimal =false;
+    isUrl = false;
+
     for(int i = 0; i < delimitadores.length(); i++){
-        if(decimal.find(delimitadores[i]) != std::string::npos){
+        if(!isDecimal && decimal.find(delimitadores[i]) != std::string::npos){
             isDecimal = true;
             cout << "Puede ser decimal" <<endl;
         }
-        if(mail.find_first_of(delimitadores[i]) != std::string::npos){
-            isMail = true;
-            cout << "Puede ser email" <<endl;
-        }
-        if(acronimo.find_first_of(delimitadores[i]) != std::string::npos){
-            isAcronimo = true;
-            cout << "Puede ser acronimo" <<endl;
-        }
-        if(multipalabras.find_first_of(delimitadores[i]) != std::string::npos){
-            isMultipalabras = true;
-            cout << "Puede ser multipalabra" <<endl;
-        }
-        if(URL.find_first_of(delimitadores[i]) != std::string::npos){
+        if(!isUrl && URL.find_first_of(delimitadores[i]) != std::string::npos){
             isUrl = true;
             cout << "Puede ser url" <<endl;
         }

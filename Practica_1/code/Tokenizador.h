@@ -181,24 +181,9 @@ private:
 
     string decimal= ".,";
 
-    string mail= ".-_@";
-
-    string acronimo = ".";
-
-    string multipalabras = "-";
-
-
     bool isUrl = false;
 
     bool isDecimal = false;
-
-    bool isMail = false;
-
-    bool isAcronimo = false;
-
-    bool isMultipalabras = false;
-
-
 
     /**
      * Quita las repeticiones de los delimitadores, eliminado los elementos
