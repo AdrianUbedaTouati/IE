@@ -15,7 +15,7 @@ using namespace std;
 
 class Tokenizador {
 
-    /*
+    /**
      * cout << “DELIMITADORES: “ << delimiters << “ TRATA CASOS ESPECIALES:
      * “ << casosEspeciales << “ PASAR A MINUSCULAS Y SIN ACENTOS: “ <<
      * pasarAminuscSinAcentos;
@@ -29,7 +29,7 @@ class Tokenizador {
 
 public:
 
-    /*
+    /**
      * Inicializa delimiters a delimitadoresPalabra filtrando que no se
      * introduzcan delimitadores repetidos (de izquierda a derecha, en cuyo
      * caso se eliminarían los que hayan sido repetidos por la derecha);
@@ -38,34 +38,34 @@ public:
      */
     Tokenizador (string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
 
-    /*
+    /**
      * Constructor de copia
      */
     Tokenizador (const Tokenizador&);
 
-    /*
+    /**
      * Inicializa delimiters=",;:.-/+*\\ '\"{}[]()<>¡!¿?&#=\t\n\r@";
      * casosEspeciales a true; pasarAminuscSinAcentos a false
      */
     Tokenizador ();
 
-    /*
+    /**
      * Pone delimiters=""
      */
     ~Tokenizador ();
 
-    /*
+    /**
      * Operador de asignacion
      */
     Tokenizador& operator= (const Tokenizador&);
 
-    /*
+    /**
      * Tokeniza str devolviendo el resultado en tokens. La lista tokens se
      * vaciará antes de almacenar el resultado de la tokenización.
      */
-    void Tokenizar (const string& str, list<string>& tokens) const;
+    void Tokenizar (string& str, list<string>& tokens) const;
 
-    /*
+    /**
      * Tokeniza el fichero i guardando la salida en el fichero f (una
      * palabra en cada línea del fichero). Devolverá true si se realiza la
      * tokenización de forma correcta; false en caso contrario enviando a cerr
@@ -73,7 +73,7 @@ public:
      */
     bool Tokenizar (const string& i, const string& f) const;
 
-    /*
+    /**
      * Tokeniza el fichero i guardando la salida en un fichero de nombre i
      * añadiéndole extensión .tk (sin eliminar previamente la extensión de i
      * por ejemplo, del archivo pp.txt se generaría el resultado en pp.txt.tk),
@@ -84,7 +84,7 @@ public:
      */
     bool Tokenizar (const string & i) const;
 
-    /*
+    /**
      * Tokeniza el fichero i que contiene un nombre de fichero por línea
      * guardando la salida en ficheros (uno por cada línea de i) cuyo nombre
      * será el leído en i añadiéndole extensión .tk, y que contendrá una
@@ -98,7 +98,7 @@ public:
      */
     bool TokenizarListaFicheros (const string& i) const;
 
-    /*
+    /**
      * Tokeniza todos los archivos que contenga el directorio i, incluyendo
      * los de los subdirectorios, guardando la salida en ficheros cuyo nombre
      * será el de entrada añadiéndole extensión .tk, y que contendrá una
@@ -109,41 +109,54 @@ public:
      */
     bool TokenizarDirectorio (const string& i) const;
 
-    /*
+    /**
      * Inicializa delimiters a nuevoDelimiters, filtrando que no se
      * introduzcan delimitadores repetidos (de izquierda a derecha, en cuyo
      * caso se eliminarían los que hayan sido repetidos por la derecha)
      */
     void DelimitadoresPalabra(const string& nuevoDelimiters);
 
-    /*
+    /**
      * Añade al final de “delimiters” los nuevos delimitadores que aparezcan
      * en “nuevoDelimiters” (no se almacenarán caracteres repetidos)
      */
     void AnyadirDelimitadoresPalabra(const string& nuevoDelimiters);
 
-    // Devuelve “delimiters”
+    /**
+     * Devuelve “delimiters”
+     */
+
     string DelimitadoresPalabra() const;
 
-    // Cambia la variable privada “casosEspeciales”
+    /**
+     * Cambia la variable privada “casosEspeciales”
+     */
+
     void CasosEspeciales (const bool& nuevoCasosEspeciales);
 
-    // Devuelve el contenido de la variable privada “casosEspeciales”
+    /**
+     * Devuelve el contenido de la variable privada “casosEspeciales”
+     */
     bool CasosEspeciales () const;
 
-    /*
+    /**
      * Cambia la variable privada “pasarAminuscSinAcentos”. Atención al
      * formato de codificación del corpus (comando “file” de Linux). Para la
      * corrección de la práctica se utilizará el formato actual (ISO-8859).
      */
     void PasarAminuscSinAcentos (const bool& nuevoPasarAminuscSinAcentos);
 
-    // Devuelve el contenido de la variable privada “pasarAminuscSinAcentos”
+    /**
+     * Devuelve el contenido de la variable privada “pasarAminuscSinAcentos”
+     */
     bool PasarAminuscSinAcentos () const;
 
 
+
+    //void str2lowercaseNoAccents(string &str);
+
 private:
-    /*
+    /**
      * Delimitadores de términos. Aunque se
      * modifique la forma de almacenamiento interna para mejorar la eficiencia, este
      * campo debe permanecer para indicar el orden en que se introdujeron los
@@ -151,24 +164,73 @@ private:
      */
     string delimiters;
 
-    /*
+    /**
      * Si true detectará palabras compuestas y casos especiales. Sino,
      * trabajará al igual que el algoritmo propuesto en la sección “Versión del
      * tokenizador vista en clase”
      */
     bool casosEspeciales;
 
-    /*
+    /**
      * Si true pasará el token a minúsculas y quitará acentos, antes de
      * realizar la tokenización
      */
     bool pasarAminuscSinAcentos;
 
-    /*
+    string URL =  ":/.?&-=#@";
+
+    string decimal= ".,";
+
+    string mail= ".-_@";
+
+    string acronimo = ".";
+
+    string multipalabras = "-";
+
+
+    bool isUrl = false;
+
+    bool isDecimal = false;
+
+    bool isMail = false;
+
+    bool isAcronimo = false;
+
+    bool isMultipalabras = false;
+
+
+
+    /**
      * Quita las repeticiones de los delimitadores, eliminado los elementos
      * mas a la derecha
+     * Ademas de añadir los demilitadores ' ' y '\n' en caso de que sean casos especiales
      */
-    string QuitarRepeticiones(const string& delimitadores) const;
+    string PreparacionDelimitadores(const string& delimitadores);
+
+    void PosiblesCasosEspeciales(string delimitadores);
+
+    void AuxTokenizar (const string& str, list<string>& tokens,string delimitadoresPalabra) const;
+
+    list<string> DetectarCasosEspeciales(const char& str) const;
+
+    void DetectarUrl(const string& str, list<string>& tokens,string delimitadoresPalabra) const;
+
+    void DetectarDecimal(const string& str, list<string>& tokens,string delimitadoresPalabra) const;
+
+    void DetectarMail(const string& str, list<string>& tokens,string delimitadoresPalabra) const;
+
+    void DetectarAcronimo(const string& str, list<string>& tokens,string delimitadoresPalabra) const;
+
+    void DetectarGuion(const string& str, list<string>& tokens,string delimitadoresPalabra) const;
+
+    bool IsNum(string& str) const;
+
+    //void initCharTemplate();
+    //unsigned char charTemplate[256];
+
+    void PasarAminuscSinAcentosFun(string& str)const;
+
+
 };
 
 #endif /*PRACTICA_1_TOKENIZADOR_H*/
