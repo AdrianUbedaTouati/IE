@@ -40,9 +40,8 @@ ostream& operator<<(ostream& os, const Tokenizador& tokenizador) {
     return os;
 }
 
-
 void
-Tokenizador::Tokenizar (const char* str1, list<string>& tokens) const {
+Tokenizador::Tokenizar (const char* str1, list<string>& tokens) {
     string str = str1;
     tokens.clear();
     string delimitadores = delimiters;
@@ -60,7 +59,7 @@ Tokenizador::Tokenizar (const char* str1, list<string>& tokens) const {
 }
 
 void
-Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimitadoresPalabra) const {
+Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimitadoresPalabra) {
     bool primerToken = true;
     string token;
     string::size_type primerCaracter = str.find_first_not_of(delimitadoresPalabra,0);
@@ -69,25 +68,19 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
         if (!casosEspeciales) {
             tokens.push_back(str.substr(primerCaracter, posDelimitador - primerCaracter));
         } else {
-            /*
+
             if (primerToken) {
-                token = str.substr(primerCaracter, posDelimitador - primerCaracter);
+                token = str.substr(primerCaracter, posDelimitador - primerCaracter + 1);
             } else {
                 token = str.substr(primerCaracter - 1, posDelimitador - primerCaracter + 2);
             }
-             */
-
-            token = str.substr(primerCaracter == 0 ? 0 : (primerCaracter - 1),posDelimitador - primerCaracter + (primerCaracter == 0 ? 1 : 2));
-            //cout<<token<<endl;
-            //cout << str.substr(primerCaracter == 0 ? 0 : (primerCaracter - 1), posDelimitador - primerCaracter + (primerCaracter == 0 ? 1 : 2)) << endl;
 
             if (isUrl && primerToken && (token.find("http:") == 0 || token.find("https:") == 0 || token.find("ftp:") == 0)
                 || (delimitadoresPalabra.find(token[0]) != string::npos && (token.find("http:") == 1
                 || token.find("https:") == 1 ||token.find("ftp:") == 1))) {
-                TratarURL(str, primerCaracter, posDelimitador, delimitadoresPalabra);
+                TratarURL(str, delimitadoresPalabra, posDelimitador);
             }
             else if (IsDecimal(token)){
-                //cout << "Soy el token" << token << " y soy un decimal" << endl;
                 if (token[0] == '.' || token[0] == ',') {
                     string aux = token;
                     aux = "0" + aux;
@@ -97,21 +90,17 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
                     continue;
                 }
             }else if (token[token.size()-1] == '@') {
-                TratarEmail(str, primerCaracter, posDelimitador, delimitadoresPalabra);
-
+                TratarEmail(str,delimitadoresPalabra, posDelimitador);
                 //cout << "Soy el token" << token << " y soy un mail" << endl;
             } else if (token[token.size()-1] == '.') {
-                TratarAcronimo(str, primerCaracter, posDelimitador, delimitadoresPalabra);
+                TratarAcronimo(str,delimitadoresPalabra, posDelimitador);
                 //cout << "Soy el token" << token << " y soy un acronimo" << endl;
             } else if (token[token.size()-1] == '-') {
-                TratarMultipalabra(str, primerCaracter, posDelimitador, delimitadoresPalabra);
+                TratarMultipalabra(str,delimitadoresPalabra, posDelimitador);
                 //cout << "Soy el token" << token << " y soy una multipalabea" << endl;
             }
             token = str.substr(primerCaracter, posDelimitador - primerCaracter);
             tokens.push_back(token);
-            //cout << token[token.size()-1] << endl;
-            //cout << token.back() << endl;
-            // tokens.push_back(str.substr(primerCaracter, posDelimitador - primerCaracter));
             if (primerToken) {
                 primerToken = false;
             }
@@ -121,88 +110,90 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
     }
 }
 
-void Tokenizador::TratarURL(const string &str, size_t &firstPos, size_t &lastPos,
-                               string &delimitadores) const {
-    size_t i = lastPos;
+void
+Tokenizador::TratarURL(const string &str,string& delimitadoresPalabra, size_t& posDelimitador){
+    size_t i = posDelimitador;
     string delim = "_:/.?&-=#@";
     auto delimAux = delim.c_str();
     do {
-        i = str.find_first_of(delimitadores, ++i);
+        i = str.find_first_of(delimitadoresPalabra, ++i);
         if (i == string::npos) {
-            if (lastPos + 1 != str.size()) {
-                lastPos = str.size();
+            if (posDelimitador + 1 != str.size()) {
+                posDelimitador = str.size();
             }
             break;
         } else if (i != str.find_first_of(delimAux, i)) {
-            lastPos = i;
+            posDelimitador = i;
             break;
         }
     } while (1);
 }
 
-void Tokenizador::TratarEmail(const string &str, size_t &firstPos, size_t &lastPos, string &delimitadores) const {
-    size_t i = lastPos;
+void
+Tokenizador::TratarEmail(const string &str,string& delimitadoresPalabra, size_t& posDelimitador){
+    size_t i = posDelimitador;
     string delim = "_:/.?&-=#";
     auto delimAux = delim.c_str();
     do {
-        i = str.find_first_of(delimitadores, ++i);
+        i = str.find_first_of(delimitadoresPalabra, ++i);
         if (i == string::npos) {
-            if (lastPos + 1 != str.size()) {
-                lastPos = str.size();
+            if (posDelimitador + 1 != str.size()) {
+                posDelimitador = str.size();
             }
             break;
         } else if (i == str.find('@', i)) { // mas de 1 @
             break;
         } else if (i != str.find_first_of(delimAux, i)) {
-            lastPos = i;
+            posDelimitador = i;
             break;
         }
     } while (1);
 }
 
-void Tokenizador::TratarAcronimo (const string &str, size_t &firstPos, size_t &lastPos, string &delimitadores) const {
-    size_t i = lastPos;
+void
+Tokenizador::TratarAcronimo (const string &str,string& delimitadoresPalabra,size_t& posDelimitador){
+    size_t i = posDelimitador;
     do {
-        i = str.find_first_of(delimitadores, ++i);
+        i = str.find_first_of(delimitadoresPalabra, ++i);
         if (i == string::npos) {
-            if (lastPos + 1 != str.size()) {
-                lastPos = str.size();
+            if (posDelimitador + 1 != str.size()) {
+                posDelimitador = str.size();
             }
             break;
         } else if (i != str.find('.', i)) {
-            if (i != lastPos + 1) {
-                lastPos = i;
+            if (i != posDelimitador + 1) {
+                posDelimitador = i;
             }
             break;
         } else {
-            if (i == lastPos + 1) { // no se guarda el ultimo .
+            if (i == posDelimitador + 1) { // no se guarda el ultimo .
                 break;
             }
-            lastPos = i;
+            posDelimitador = i;
         }
     } while (1);
 }
 
-void Tokenizador::TratarMultipalabra(const string &str, size_t &firstPos, size_t &lastPos,
-                                     string &delimitadores) const {
-    size_t i = lastPos;
+void
+Tokenizador::TratarMultipalabra(const string &str,string& delimitadoresPalabra, size_t& posDelimitador){
+    size_t i = posDelimitador;
     do {
-        i = str.find_first_of(delimitadores, ++i);
+        i = str.find_first_of(delimitadoresPalabra, ++i);
         if (i == string::npos) {
-            if (lastPos + 1 != str.size()) {
-                lastPos = str.size();
+            if (posDelimitador + 1 != str.size()) {
+                posDelimitador = str.size();
             }
             break;
         } else if (i != str.find('-', i)) {
-            if (i != lastPos + 1) {
-                lastPos = i;
+            if (i != posDelimitador + 1) {
+                posDelimitador = i;
             }
             break;
         } else {
-            if (i == lastPos + 1) { // no se guarda el ultimo -
+            if (i == posDelimitador + 1) { // no se guarda el ultimo -
                 break;
             }
-            lastPos = i;
+            posDelimitador = i;
         }
     } while (1);
 }
@@ -305,7 +296,7 @@ Tokenizador::PasarAminuscSinAcentosFun(string& str)const{
 }
 
 bool
-Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) const {
+Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) {
     ifstream i;
     ofstream f;
     string cadena;
@@ -345,17 +336,17 @@ Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) con
 }
 
 bool
-Tokenizador::Tokenizar (const string & i) const{
+Tokenizador::Tokenizar (const string & i) {
     return Tokenizar(i,i+".tk");
 }
 
 bool
-Tokenizador::TokenizarListaFicheros (const string& i) const{
+Tokenizador::TokenizarListaFicheros (const string& i) {
 
 }
 
 bool
-Tokenizador::TokenizarDirectorio (const string& dirAIndexar) const {
+Tokenizador::TokenizarDirectorio (const string& dirAIndexar)  {
     struct stat dir;
     // Compruebo la existencia del directorio
     int err=stat(dirAIndexar.c_str(), &dir);

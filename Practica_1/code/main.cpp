@@ -13,18 +13,39 @@ void imprimirListaSTL(const list<string>& cadena)
 int main() {
     bool kCasosEspeciales = true, kpasarAminusculas = false;
 
-    list<string> lt1, lt2, lt3;
+    list<string> lt1, lt2;
 
-    Tokenizador a("[]# ", kCasosEspeciales, kpasarAminusculas);
-    a.Tokenizar("MS#DOS OS_2 [high low]", lt1);
-    imprimirListaSTL(lt1);
+    Tokenizador a("-#", true, false);
+    list<string> tokens;
 
-    a.AnyadirDelimitadoresPalabra("_ []");
-    a.Tokenizar("MS#DOS OS_2 [high low]", lt2);
-    imprimirListaSTL(lt2);
+    a.DelimitadoresPalabra("@.&");
+    a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
+    imprimirListaSTL(tokens);
 
-    a.DelimitadoresPalabra("_");
-    a.Tokenizar("MS#DOS OS_2 [high low]", lt3);
-    imprimirListaSTL(lt3);
+    a.Tokenizar("pal1 @iuii.ua.es p1 p2", tokens);
+    imprimirListaSTL(tokens);
+
+    a.DelimitadoresPalabra("&.");
+    a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
+    imprimirListaSTL(tokens);
+
+    a.Tokenizar("pal1 @iuii.ua.es p1 p2", tokens);
+    imprimirListaSTL(tokens);
+
+    a.Tokenizar("pal1&@iuii.ua.es p1 p2", tokens);
+    imprimirListaSTL(tokens);
+
+    a.Tokenizar("pal1&catedra@iuii.ua.es p1 p2", tokens);
+    imprimirListaSTL(tokens);
+
+    a.PasarAminuscSinAcentos(true);
+    a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
+    imprimirListaSTL(tokens);
+
+
+    a.DelimitadoresPalabra("@.&");
+    a.CasosEspeciales (false);
+    a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
+    imprimirListaSTL(tokens);
 
 }

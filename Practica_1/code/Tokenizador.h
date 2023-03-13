@@ -63,7 +63,7 @@ public:
      * Tokeniza str devolviendo el resultado en tokens. La lista tokens se
      * vaciará antes de almacenar el resultado de la tokenización.
      */
-    void Tokenizar (const char* str1, list<string>& tokens) const;
+    void Tokenizar (const char* str1, list<string>& tokens);
 
     /**
      * Tokeniza el fichero i guardando la salida en el fichero f (una
@@ -71,7 +71,7 @@ public:
      * tokenización de forma correcta; false en caso contrario enviando a cerr
      * el mensaje correspondiente (p.ej. que no exista el archivo i)
      */
-    bool Tokenizar (const string& i, const string& f) const;
+    bool Tokenizar (const string& i, const string& f) ;
 
     /**
      * Tokeniza el fichero i guardando la salida en un fichero de nombre i
@@ -82,7 +82,7 @@ public:
      * enviando a cerr el mensaje correspondiente (p.ej. que no exista el
      * archivo i)
      */
-    bool Tokenizar (const string & i) const;
+    bool Tokenizar (const string & i) ;
 
     /**
      * Tokeniza el fichero i que contiene un nombre de fichero por línea
@@ -96,7 +96,7 @@ public:
      * sean directorios; luego no se ha de interrumpir la ejecución si hay
      * algún archivo en i que no exista)
      */
-    bool TokenizarListaFicheros (const string& i) const;
+    bool TokenizarListaFicheros (const string& i) ;
 
     /**
      * Tokeniza todos los archivos que contenga el directorio i, incluyendo
@@ -107,7 +107,7 @@ public:
      * caso contrario enviando a cerr el mensaje correspondiente (p.ej. que no
      * exista el directorio i, o los ficheros que no se hayan podido tokenizar)
      */
-    bool TokenizarDirectorio (const string& i) const;
+    bool TokenizarDirectorio (const string& i) ;
 
     /**
      * Inicializa delimiters a nuevoDelimiters, filtrando que no se
@@ -151,10 +151,6 @@ public:
      */
     bool PasarAminuscSinAcentos () const;
 
-
-
-    //void str2lowercaseNoAccents(string &str);
-
 private:
     /**
      * Delimitadores de términos. Aunque se
@@ -194,40 +190,21 @@ private:
 
     void PosiblesCasosEspeciales(string delimitadores);
 
-    void AuxTokenizar (const string& str, list<string>& tokens,string delimitadoresPalabra) const;
-
-    list<string> DetectarCasosEspeciales(const char& str) const;
-
-    void DetectarUrl(const string& str, list<string>& tokens,string delimitadoresPalabra) const;
-
-    void DetectarDecimal(const string& str, list<string>& tokens,string delimitadoresPalabra) const;
-
-    void DetectarMail(const string& str, list<string>& tokens,string delimitadoresPalabra) const;
-
-    void DetectarAcronimo(const string& str, list<string>& tokens,string delimitadoresPalabra) const;
-
-    void DetectarGuion(const string& str, list<string>& tokens,string delimitadoresPalabra) const;
-
-    bool IsNum(string& str) const;
-
-    //void initCharTemplate();
-    //unsigned char charTemplate[256];
+    void AuxTokenizar (const string& str, list<string>& tokens,string delimitadoresPalabra);
 
     void PasarAminuscSinAcentosFun(string& str)const;
 
     bool IsDecimal(const string &token)const;
 
-    void TratarURL(const string &str, size_t &firstPos, size_t &lastPos,
-                   string&) const;
+    void TratarURL(const string&,string&, size_t&);
 
-    void TratarEmail(const string &str, size_t &firstPos, size_t &lastPos, string&) const;
-
-
-    void TratarAcronimo (const string &str, size_t &firstPos, size_t &lastPos, string&) const;
+    void TratarEmail(const string& ,string&, size_t&);
 
 
-    void TratarMultipalabra(const string &str, size_t &firstPos, size_t &lastPos,string&) const;
+    void TratarAcronimo (const string&,string&, size_t&);
 
+
+    void TratarMultipalabra(const string&,string&, size_t&);
 
 };
 
