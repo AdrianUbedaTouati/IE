@@ -111,93 +111,92 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
 }
 
 void
-Tokenizador::TratarURL(const string &str,string& delimitadoresPalabra, size_t& posDelimitador){
-    size_t i = posDelimitador;
-    string delim = "_:/.?&-=#@";
-    auto delimAux = delim.c_str();
-    do {
-        i = str.find_first_of(delimitadoresPalabra, ++i);
-        if (i == string::npos) {
-            if (posDelimitador + 1 != str.size()) {
+Tokenizador::TratarURL(const string& str,string& delimitadoresPalabra, size_t& posDelimitador){
+    string deilimitadoresEspeciales = "_:/.?&-=#@";
+    for(size_t indice = posDelimitador; indice < str.length();){
+        indice++;
+        indice = str.find_first_of(delimitadoresPalabra,indice);
+        if(indice != str.find_first_of(deilimitadoresEspeciales, indice)){
+            posDelimitador = indice;
+            break;
+        }else if (indice == string::npos) {
+            if (posDelimitador != str.size() - 1) {
                 posDelimitador = str.size();
             }
             break;
-        } else if (i != str.find_first_of(delimAux, i)) {
-            posDelimitador = i;
-            break;
         }
-    } while (1);
+    }
 }
 
 void
 Tokenizador::TratarEmail(const string &str,string& delimitadoresPalabra, size_t& posDelimitador){
-    size_t i = posDelimitador;
-    string delim = "_:/.?&-=#";
-    auto delimAux = delim.c_str();
-    do {
-        i = str.find_first_of(delimitadoresPalabra, ++i);
-        if (i == string::npos) {
-            if (posDelimitador + 1 != str.size()) {
+    string deilimitadoresEspeciales = "_:/.?&-=#";
+    for(size_t indice = posDelimitador; indice < str.length();) {
+        indice++;
+        indice = str.find_first_of(delimitadoresPalabra, indice);
+        if (indice == str.find('@', indice)) { // mas de 1 @
+            break;
+        } else if (indice != str.find_first_of(deilimitadoresEspeciales, indice)) {
+            posDelimitador = indice;
+            break;
+        } else if (indice == string::npos) {
+            if (posDelimitador != str.size() - 1) {
                 posDelimitador = str.size();
             }
             break;
-        } else if (i == str.find('@', i)) { // mas de 1 @
-            break;
-        } else if (i != str.find_first_of(delimAux, i)) {
-            posDelimitador = i;
-            break;
         }
-    } while (1);
+    }
 }
 
 void
 Tokenizador::TratarAcronimo (const string &str,string& delimitadoresPalabra,size_t& posDelimitador){
-    size_t i = posDelimitador;
+    size_t indice = posDelimitador;
     do {
-        i = str.find_first_of(delimitadoresPalabra, ++i);
-        if (i == string::npos) {
+        indice ++;
+        indice = str.find_first_of(delimitadoresPalabra, indice);
+        if (indice == string::npos) {
             if (posDelimitador + 1 != str.size()) {
                 posDelimitador = str.size();
             }
             break;
-        } else if (i != str.find('.', i)) {
-            if (i != posDelimitador + 1) {
-                posDelimitador = i;
+        } else if (indice != str.find('.', indice)) {
+            if (indice != posDelimitador + 1) {
+                posDelimitador = indice;
             }
             break;
         } else {
-            if (i == posDelimitador + 1) { // no se guarda el ultimo .
+            if (indice == posDelimitador + 1) { // no se guarda el ultimo .
                 break;
             }
-            posDelimitador = i;
+            posDelimitador = indice;
         }
-    } while (1);
+    } while (str.length());
 }
 
 void
 Tokenizador::TratarMultipalabra(const string &str,string& delimitadoresPalabra, size_t& posDelimitador){
-    size_t i = posDelimitador;
+    size_t indice = posDelimitador;
     do {
-        i = str.find_first_of(delimitadoresPalabra, ++i);
-        if (i == string::npos) {
+        indice++;
+        indice = str.find_first_of(delimitadoresPalabra, indice);
+        if (indice == string::npos) {
             if (posDelimitador + 1 != str.size()) {
                 posDelimitador = str.size();
             }
             break;
-        } else if (i != str.find('-', i)) {
-            if (i != posDelimitador + 1) {
-                posDelimitador = i;
+        } else if (indice != str.find('-', indice)) {
+            if (indice != posDelimitador + 1) {
+                posDelimitador = indice;
             }
             break;
         } else {
-            if (i == posDelimitador + 1) { // no se guarda el ultimo -
+            if (indice == posDelimitador + 1) { // no se guarda el ultimo -
                 break;
             }
-            posDelimitador = i;
+            posDelimitador = indice;
         }
-    } while (1);
+    } while (str.length());
 }
-
 
 bool
 Tokenizador::IsDecimal(const string &token) const{

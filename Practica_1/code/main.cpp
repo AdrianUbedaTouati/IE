@@ -15,37 +15,10 @@ int main() {
 
     list<string> lt1, lt2;
 
-    Tokenizador a("-#", true, false);
+    Tokenizador a("@.", true, false);
     list<string> tokens;
 
-    a.DelimitadoresPalabra("@.&");
-    a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
-    imprimirListaSTL(tokens);
-
-    a.Tokenizar("pal1 @iuii.ua.es p1 p2", tokens);
-    imprimirListaSTL(tokens);
-
-    a.DelimitadoresPalabra("&.");
-    a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
-    imprimirListaSTL(tokens);
-
-    a.Tokenizar("pal1 @iuii.ua.es p1 p2", tokens);
-    imprimirListaSTL(tokens);
-
-    a.Tokenizar("pal1&@iuii.ua.es p1 p2", tokens);
-    imprimirListaSTL(tokens);
-
-    a.Tokenizar("pal1&catedra@iuii.ua.es p1 p2", tokens);
-    imprimirListaSTL(tokens);
-
-    a.PasarAminuscSinAcentos(true);
-    a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
-    imprimirListaSTL(tokens);
-
-
-    a.DelimitadoresPalabra("@.&");
-    a.CasosEspeciales (false);
-    a.Tokenizar("catedraTelefonicaUA@iuii.ua.es p1 p2", tokens);
+    a.Tokenizar("cat@iuii.ua.es@cd", tokens);
     imprimirListaSTL(tokens);
 
 }
