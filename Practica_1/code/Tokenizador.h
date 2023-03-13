@@ -215,6 +215,19 @@ private:
 
     void PasarAminuscSinAcentosFun(string& str)const;
 
+    bool IsDecimal(const string &token)const;
+
+    void TratarURL(const string &str, size_t &firstPos, size_t &lastPos,
+                   string&) const;
+
+    void TratarEmail(const string &str, size_t &firstPos, size_t &lastPos, string&) const;
+
+
+    void TratarAcronimo (const string &str, size_t &firstPos, size_t &lastPos, string&) const;
+
+
+    void TratarMultipalabra(const string &str, size_t &firstPos, size_t &lastPos,string&) const;
+
 
 };
 

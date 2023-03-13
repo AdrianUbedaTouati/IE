@@ -70,38 +70,162 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
             if (primerToken) {
                 token = str.substr(primerCaracter, posDelimitador - primerCaracter);
             } else {
-                token = str.substr(primerCaracter - 1, posDelimitador - primerCaracter + 1);
+                token = str.substr(primerCaracter - 1, posDelimitador - primerCaracter + 2);
             }
 
-            if (isUrl) {
-                if (primerToken && (token.find("http:") == 0 || token.find("https:") == 0 || token.find("ftp:") == 0)
-                    || (delimitadoresPalabra.find(token[0]) != string::npos && (token.find("http:") == 1
-                    || token.find("https:") == 1 || token.find("ftp:") == 1))) {
-                    cout << "Soy el token" << token << "y soy una url"<<endl;
-                }
-            }else if (isDecimal){
-                if(token[token.size()] == '.' || token[token.size()] == ',' ||token[token.size()] == ' '
-                   || token[0] == '.' || token[0] == ',' ||token[0] == ' ' ){
-                    cout << "Soy el token" << token << "y soy un decimal" << endl;
-                }
-            } else if (posDelimitador == '@') {
-                cout << "Soy el token" << token << "y soy un mail"<<endl;
-            } else if (posDelimitador == '.') {
-                cout << "Soy el token" << token << "y soy un acronimo"<<endl;
-            } else if (posDelimitador == '-') {
-                cout << "Soy el token" << token << "y soy una multipalabea"<<endl;
+            //token = str.substr(primerCaracter == 0 ? 0 : (primerCaracter - 1),posDelimitador - primerCaracter + (primerCaracter == 0 ? 1 : 2));
+            cout<<token<<endl;
+            cout << str.substr(primerCaracter == 0 ? 0 : (primerCaracter - 1),
+                               posDelimitador - primerCaracter + (primerCaracter == 0 ? 1 : 2)) << endl;
+
+            if (isUrl && primerToken && (token.find("http:") == 0 || token.find("https:") == 0 || token.find("ftp:") == 0)
+                || (delimitadoresPalabra.find(token[0]) != string::npos && (token.find("http:") == 1
+                || token.find("https:") == 1 ||token.find("ftp:") == 1))) {
+                TratarURL(str, primerCaracter, posDelimitador, delimitadoresPalabra);
             }
+            else if (IsDecimal(token)){
+                cout << "Soy el token" << token << " y soy un decimal" << endl;
+                if (token[0] == '.' || token[0] == ',') {
+                    string aux = token;
+                    aux = "0" + aux;
+                    tokens.push_back(aux);
+                    primerCaracter = str.find_first_not_of(delimitadoresPalabra, posDelimitador);
+                    posDelimitador = str.find_first_of(delimitadoresPalabra, primerCaracter);
+                    continue;
                 }
-                //cout << token <<endl;
-                //cout <<  str.substr(primerCaracter == 0 ? 0 : (primerCaracter - 1), posDelimitador - primerCaracter + (primerCaracter == 0 ? 1 : 2))<<endl;
-                // tokens.push_back(str.substr(primerCaracter, posDelimitador - primerCaracter));
-        }
-        if (primerToken) {
-            primerToken = false;
+            }else if (token[token.size()-1] == '@') {
+                TratarEmail(str, primerCaracter, posDelimitador, delimitadoresPalabra);
+                cout << "Soy el token" << token << " y soy un mail" << endl;
+            } else if (token[token.size()-1] == '.') {
+                TratarAcronimo(str, primerCaracter, posDelimitador, delimitadoresPalabra);
+                cout << "Soy el token" << token << " y soy un acronimo" << endl;
+            } else if (token[token.size()-1] == '-') {
+                TratarMultipalabra(str, primerCaracter, posDelimitador, delimitadoresPalabra);
+                cout << "Soy el token" << token << " y soy una multipalabea" << endl;
+            }
+            token = str.substr(primerCaracter, posDelimitador - primerCaracter);
+            tokens.push_back(token);
+            //cout << token[token.size()-1] << endl;
+            //cout << token.back() << endl;
+            // tokens.push_back(str.substr(primerCaracter, posDelimitador - primerCaracter));
+            if (primerToken) {
+                primerToken = false;
+            }
         }
         primerCaracter = str.find_first_not_of(delimitadoresPalabra, posDelimitador);
         posDelimitador = str.find_first_of(delimitadoresPalabra, primerCaracter);
     }
+}
+
+void Tokenizador::TratarURL(const string &str, size_t &firstPos, size_t &lastPos,
+                               string &delimitadores) const {
+    size_t i = lastPos;
+    string delim = "_:/.?&-=#@";
+    auto delimAux = delim.c_str();
+    do {
+        i = str.find_first_of(delimitadores, ++i);
+        if (i == string::npos) {
+            if (lastPos + 1 != str.size()) {
+                lastPos = str.size();
+            }
+            break;
+        } else if (i != str.find_first_of(delimAux, i)) {
+            lastPos = i;
+            break;
+        }
+    } while (1);
+}
+
+void Tokenizador::TratarEmail(const string &str, size_t &firstPos, size_t &lastPos, string &delimitadores) const {
+    size_t i = lastPos;
+    string delim = "_:/.?&-=#";
+    auto delimAux = delim.c_str();
+    do {
+        i = str.find_first_of(delimitadores, ++i);
+        if (i == string::npos) {
+            if (lastPos + 1 != str.size()) {
+                lastPos = str.size();
+            }
+            break;
+        } else if (i == str.find('@', i)) { // mas de 1 @
+            break;
+        } else if (i != str.find_first_of(delimAux, i)) {
+            lastPos = i;
+            break;
+        }
+    } while (1);
+}
+
+void Tokenizador::TratarAcronimo (const string &str, size_t &firstPos, size_t &lastPos, string &delimitadores) const {
+    size_t i = lastPos;
+    do {
+        i = str.find_first_of(delimitadores, ++i);
+        if (i == string::npos) {
+            if (lastPos + 1 != str.size()) {
+                lastPos = str.size();
+            }
+            break;
+        } else if (i != str.find('.', i)) {
+            if (i != lastPos + 1) {
+                lastPos = i;
+            }
+            break;
+        } else {
+            if (i == lastPos + 1) { // no se guarda el ultimo .
+                break;
+            }
+            lastPos = i;
+        }
+    } while (1);
+}
+
+void Tokenizador::TratarMultipalabra(const string &str, size_t &firstPos, size_t &lastPos,
+                                     string &delimitadores) const {
+    size_t i = lastPos;
+    do {
+        i = str.find_first_of(delimitadores, ++i);
+        if (i == string::npos) {
+            if (lastPos + 1 != str.size()) {
+                lastPos = str.size();
+            }
+            break;
+        } else if (i != str.find('-', i)) {
+            if (i != lastPos + 1) {
+                lastPos = i;
+            }
+            break;
+        } else {
+            if (i == lastPos + 1) { // no se guarda el ultimo -
+                break;
+            }
+            lastPos = i;
+        }
+    } while (1);
+}
+
+
+bool
+Tokenizador::IsDecimal(const string &token) const{
+    if (isDecimal && (token[token.size()-1] == '.' || token[token.size()-1] == ',' || token[token.size()-1] == ' '
+    || token[0] == '.' || token[0] == ',' || token[0] == ' ')) {
+
+        //cualquier caracter al principio de la cadena
+        size_t caracter = token.find_first_of("^%", token.size() - 2);
+
+        if (caracter != string::npos && token.size() == 3) {
+            return false;
+        }
+
+        for (int i = 1; i < token.size() - 1; ++i) {
+            //no son numeros
+            if (!(token[i] >= '0' && token[i] <= '9') && token[i] != ',' &&
+                token[i] != '.' && caracter == string::npos) {
+                return false;
+            }
+        }
+
+        return true;
+    } else return false;
 }
 
 
@@ -299,7 +423,6 @@ Tokenizador::PasarAminuscSinAcentos () const{
 }
 
 //Funciones auxiliares
-
 string
 Tokenizador::PreparacionDelimitadores(const string& delimitadores){
 

@@ -14,14 +14,14 @@ int main() {
     //string s1 = "á";
     //cout << s1.size() << endl;
 
-    string pepa = "@.-/";
+    string pepa = "@,.";
 
     Tokenizador pepe(pepa, true, false);
-    cout<<pepe.DelimitadoresPalabra()<<endl;
+    cout<<"Delimitadores: "<<pepe.DelimitadoresPalabra()<<endl;
 
     list<string> tokens;
 
-    string s = "hola soy pepepe 123 1,2 1, 23,4 eppe@gmail.com http:gola";
+    string s = "123 1,2 1. 23,4 0. 1,,2 a,b ,a ,vv %,532 &,a32";
 
     pepe.Tokenizar(s,tokens);
 
