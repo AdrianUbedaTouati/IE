@@ -83,6 +83,7 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
             else if (IsDecimal(token)){
                 TratarDecimal(str,delimitadoresPalabra, posDelimitador);
                 if (token[0] == '.' || token[0] == ',') {
+                    token = str.substr(primerCaracter-1, posDelimitador+1 - primerCaracter);
                     string aux = token;
                     aux = "0" + aux;
                     tokens.push_back(aux);
@@ -92,13 +93,10 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
                 }
             }else if (token[token.size()-1] == '@') {
                 TratarEmail(str,delimitadoresPalabra, posDelimitador);
-                //cout << "Soy el token" << token << " y soy un mail" << endl;
             } else if (token[token.size()-1] == '.') {
                 TratarAcronimo(str,delimitadoresPalabra, posDelimitador);
-                //cout << "Soy el token" << token << " y soy un acronimo" << endl;
             } else if (token[token.size()-1] == '-') {
                 TratarMultipalabra(str,delimitadoresPalabra, posDelimitador);
-                //cout << "Soy el token" << token << " y soy una multipalabea" << endl;
             }
             token = str.substr(primerCaracter, posDelimitador - primerCaracter);
             tokens.push_back(token);
@@ -131,12 +129,9 @@ Tokenizador::TratarURL(const string& str,string& delimitadoresPalabra, size_t& p
 
 void
 Tokenizador::TratarDecimal(const string& str,string& delimitadoresPalabra, size_t& posDelimitador){
-    cout << "estoy en decimal" << endl;
     for (size_t indice = posDelimitador; indice < str.length();) {
         indice++;
         indice = str.find_first_of(delimitadoresPalabra, indice);
-        cout << str.find('.', indice) << endl;
-        cout << str.find(',', indice) << endl;
         if (indice != str.find('.', indice) && indice != str.find(',', indice)) {
             posDelimitador = indice;
             break;
@@ -152,6 +147,7 @@ Tokenizador::TratarDecimal(const string& str,string& delimitadoresPalabra, size_
             }
             break;
         } else if (indice - 1 == posDelimitador) {
+
             break;
         }
         posDelimitador = indice;
@@ -224,7 +220,6 @@ Tokenizador::TratarMultipalabra(const string &str,string& delimitadoresPalabra, 
 
 bool
 Tokenizador::IsDecimal(const string &token) const{
-
     if (isDecimal && (token[token.size()-1] == '.' || token[token.size()-1] == ',' || token[token.size()-1] == ' '
     || token[0] == '.' || token[0] == ',' || token[0] == ' ')) {
         size_t caracter = token.find_first_of("$%", token.size() - 2);
@@ -243,29 +238,6 @@ Tokenizador::IsDecimal(const string &token) const{
 
         return true;
     } else return false;
-
-
-    /*
-    if (isDecimal && (token[0] == ' ' || token[0] == ',' || token[0] == '.' ||
-        token.back() == ' ' || token.back() == ',' || token.back() == '.')) {
-
-        size_t symbol = token.find_first_of("$%", token.size() - 2);
-
-        for (size_t i = 1; i < token.size() - 1; ++i) {
-            if ((token[i] < '0' || token[i] > '9') && token[i] != ',' &&
-                token[i] != '.' && symbol == string::npos) {
-                return false;
-            }
-        }
-
-        if (symbol != string::npos && token.size() == 3) {
-            return false;
-        }
-
-        return true;
-    }
-    return false;
-     */
 }
 
 void
@@ -365,7 +337,31 @@ Tokenizador::Tokenizar (const string & i) {
 
 bool
 Tokenizador::TokenizarListaFicheros (const string& i) {
+    string linea;
+    bool estado = true;
 
+    fstream fichero;
+    fichero.open(i, ios::in);
+
+    if (!fichero) {
+        cerr << "ERROR: No existe el fichero: " << i << endl;
+    }
+
+    while (getline(fichero, linea)) {
+        struct stat directorio;
+        if (!Tokenizar(linea)) {
+            cerr << "Error al tokenizar el fichero " << linea;
+            estado = false;
+        }else if (S_ISDIR(directorio.st_mode)) {
+            if (!TokenizarDirectorio(linea)) {
+                cerr << "Error al tokenizar el directorio " << linea;
+                estado = false;
+            }
+        }
+    }
+    fichero.close();
+
+    return estado;
 }
 
 bool
@@ -473,11 +469,9 @@ Tokenizador::PosiblesCasosEspeciales (string delimitadores) {
 
         if(!isDecimal && auxDecimal1 && auxDecimal2){
             isDecimal = true;
-            //cout << "Puede ser decimal" <<endl;
         }
         if(!isUrl && URL.find_first_of(delimitadores[i]) != std::string::npos){
             isUrl = true;
-            //cout << "Puede ser url" <<endl;
         }
     }
 }
