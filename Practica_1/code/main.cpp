@@ -15,16 +15,9 @@ int main() {
 
     list<string> lt1, lt2;
 
-    Tokenizador a("", true, false);
+    Tokenizador a("@.,&", true, false);
     list<string> tokens;
 
-    a.Tokenizar("U-D-T", tokens);
-    imprimirListaSTL(tokens);
-
-    a.Tokenizar("--U-D-T", tokens);
-    imprimirListaSTL(tokens);
-
-    a.Tokenizar("U-D-T--", tokens);
-    imprimirListaSTL(tokens);
-
+    a.Tokenizar("...10.000.a.000 ,,23.05 10/12/85 1,23E+10", lt1);
+    imprimirListaSTL(lt1);
 }

@@ -81,6 +81,7 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
                 TratarURL(str, delimitadoresPalabra, posDelimitador);
             }
             else if (IsDecimal(token)){
+                TratarDecimal(str,delimitadoresPalabra, posDelimitador);
                 if (token[0] == '.' || token[0] == ',') {
                     string aux = token;
                     aux = "0" + aux;
@@ -125,6 +126,35 @@ Tokenizador::TratarURL(const string& str,string& delimitadoresPalabra, size_t& p
             }
             break;
         }
+    }
+}
+
+void
+Tokenizador::TratarDecimal(const string& str,string& delimitadoresPalabra, size_t& posDelimitador){
+    cout << "estoy en decimal" << endl;
+    for (size_t indice = posDelimitador; indice < str.length();) {
+        indice++;
+        indice = str.find_first_of(delimitadoresPalabra, indice);
+        cout << str.find('.', indice) << endl;
+        cout << str.find(',', indice) << endl;
+        if (indice != str.find('.', indice) && indice != str.find(',', indice)) {
+            posDelimitador = indice;
+            break;
+        }
+        else if (indice == str.find('.', indice) || indice == str.find(',', indice)) {
+            //el anterior no era un delimiter
+            if (indice -1 != posDelimitador) {
+                posDelimitador = indice;
+            }
+        } else if (indice == string::npos) {
+            if (posDelimitador != str.size() - 1) {
+                posDelimitador = str.size();
+            }
+            break;
+        } else if (indice - 1 == posDelimitador) {
+            break;
+        }
+        posDelimitador = indice;
     }
 }
 

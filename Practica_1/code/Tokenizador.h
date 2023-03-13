@@ -198,6 +198,8 @@ private:
 
     void TratarURL(const string&,string&, size_t&);
 
+    void TratarDecimal(const string& str,string& delimitadoresPalabra, size_t& posDelimitador);
+
     void TratarEmail(const string& ,string&, size_t&);
 
 
