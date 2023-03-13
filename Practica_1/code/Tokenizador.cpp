@@ -2,8 +2,9 @@
 
 using namespace std;
 
-Tokenizador::Tokenizador (string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos) {
-    delimiters = PreparacionDelimitadores(delimitadoresPalabra);
+Tokenizador::Tokenizador (const char* delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos) {
+    string aux= delimitadoresPalabra;
+    delimiters = PreparacionDelimitadores(aux);
     casosEspeciales = kcasosEspeciales;
     pasarAminuscSinAcentos = minuscSinAcentos;
 
@@ -41,7 +42,8 @@ ostream& operator<<(ostream& os, const Tokenizador& tokenizador) {
 
 
 void
-Tokenizador::Tokenizar (string& str, list<string>& tokens) const {
+Tokenizador::Tokenizar (const char* str1, list<string>& tokens) const {
+    string str = str1;
     tokens.clear();
     string delimitadores = delimiters;
 
@@ -366,9 +368,13 @@ Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) con
             cadena="";
             getline(i, cadena);
             //Verifica que no haya de longitud 0
+            char aux[cadena.length()];
+            for ( int i = 0; i <cadena.length();i++){
+                aux[i]=cadena[i];
+            }
             if(cadena.length()!=0)
             {
-                Tokenizar(cadena, tokens);
+                Tokenizar(aux, tokens);
             }
         }
     }

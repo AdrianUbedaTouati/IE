@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Tokenizador::Tokenizador (string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos) {
+Tokenizador::Tokenizador (const char *delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos) {
     delimiters = PreparacionDelimitadores(delimitadoresPalabra);
     casosEspeciales = kcasosEspeciales;
     pasarAminuscSinAcentos = minuscSinAcentos;

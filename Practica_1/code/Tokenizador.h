@@ -36,7 +36,7 @@ public:
      * casosEspeciales a kcasosEspeciales; pasarAminuscSinAcentos a
      * minuscSinAcentos
      */
-    Tokenizador (string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
+    Tokenizador (const char* delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
 
     /**
      * Constructor de copia
@@ -63,7 +63,7 @@ public:
      * Tokeniza str devolviendo el resultado en tokens. La lista tokens se
      * vaciará antes de almacenar el resultado de la tokenización.
      */
-    void Tokenizar (string& str, list<string>& tokens) const;
+    void Tokenizar (const char* str1, list<string>& tokens) const;
 
     /**
      * Tokeniza el fichero i guardando la salida en el fichero f (una

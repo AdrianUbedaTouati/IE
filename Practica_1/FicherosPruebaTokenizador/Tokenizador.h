@@ -36,7 +36,7 @@ public:
      * casosEspeciales a kcasosEspeciales; pasarAminuscSinAcentos a
      * minuscSinAcentos
      */
-    Tokenizador (string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
+    Tokenizador (const char *delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
 
     /**
      * Constructor de copia
