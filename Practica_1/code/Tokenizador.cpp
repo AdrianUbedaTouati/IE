@@ -154,7 +154,7 @@ Tokenizador::TratarAcronimo (const string &str,string& delimitadoresPalabra,size
         indice++;
         indice = str.find_first_of(delimitadoresPalabra, indice);
         if (indice != str.find('.', indice)) {
-            if (indice != posDelimitador + 1) {
+            if (indice -1 != posDelimitador) {
                 posDelimitador = indice;
             }
             break;
@@ -163,7 +163,7 @@ Tokenizador::TratarAcronimo (const string &str,string& delimitadoresPalabra,size
                 posDelimitador = str.size();
             }
             break;
-        } else if (indice - 1 == posDelimitador) { // no se guarda el ultimo .
+        } else if (indice - 1 == posDelimitador) {
             break;
         }
         posDelimitador = indice;
@@ -172,27 +172,24 @@ Tokenizador::TratarAcronimo (const string &str,string& delimitadoresPalabra,size
 
 void
 Tokenizador::TratarMultipalabra(const string &str,string& delimitadoresPalabra, size_t& posDelimitador){
-    size_t indice = posDelimitador;
-    do {
+    for (size_t indice = posDelimitador; indice < str.length();) {
         indice++;
         indice = str.find_first_of(delimitadoresPalabra, indice);
-        if (indice == string::npos) {
-            if (posDelimitador + 1 != str.size()) {
-                posDelimitador = str.size();
-            }
-            break;
-        } else if (indice != str.find('-', indice)) {
-            if (indice != posDelimitador + 1) {
+        if (indice != str.find('-', indice)) {
+            if (indice -1 != posDelimitador) {
                 posDelimitador = indice;
             }
             break;
-        } else {
-            if (indice == posDelimitador + 1) { // no se guarda el ultimo -
-                break;
+        }else if (indice == string::npos) {
+            if (posDelimitador != str.size() - 1) {
+                posDelimitador = str.size();
             }
-            posDelimitador = indice;
+            break;
+        } else if (indice - 1 == posDelimitador) {
+            break;
         }
-    } while (str.length());
+        posDelimitador = indice;
+    }
 }
 
 bool
