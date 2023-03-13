@@ -210,12 +210,10 @@ void Tokenizador::TratarMultipalabra(const string &str, size_t &firstPos, size_t
 
 bool
 Tokenizador::IsDecimal(const string &token) const{
-    /*
+
     if (isDecimal && (token[token.size()-1] == '.' || token[token.size()-1] == ',' || token[token.size()-1] == ' '
     || token[0] == '.' || token[0] == ',' || token[0] == ' ')) {
-
-        //cualquier caracter al principio de la cadena
-        size_t caracter = token.find_first_of("^%", token.size() - 2);
+        size_t caracter = token.find_first_of("$%", token.size() - 2);
 
         if (caracter != string::npos && token.size() == 3) {
             return false;
@@ -231,9 +229,12 @@ Tokenizador::IsDecimal(const string &token) const{
 
         return true;
     } else return false;
-     */
-    if (token[0] == ' ' || token[0] == ',' || token[0] == '.' ||
-        token.back() == ' ' || token.back() == ',' || token.back() == '.') {
+
+
+    /*
+    if (isDecimal && (token[0] == ' ' || token[0] == ',' || token[0] == '.' ||
+        token.back() == ' ' || token.back() == ',' || token.back() == '.')) {
+
         size_t symbol = token.find_first_of("$%", token.size() - 2);
 
         for (size_t i = 1; i < token.size() - 1; ++i) {
@@ -250,8 +251,8 @@ Tokenizador::IsDecimal(const string &token) const{
         return true;
     }
     return false;
+     */
 }
-
 
 void
 Tokenizador::PasarAminuscSinAcentosFun(string& str)const{
@@ -267,11 +268,12 @@ Tokenizador::PasarAminuscSinAcentosFun(string& str)const{
             //poner a minuscula
             str[i] = caracter + 32;
         }else{
+            //a
             if ((192 <= caracter && caracter <= 197) || (224 <= caracter && caracter  <= 229)) {
                 str[i] = 97;
             }
             //e
-            else if((200 <= caracter && caracter <= 203) || (224 <= caracter && caracter <= 229)){
+            else if((200 <= caracter && caracter <= 203) || (232 <= caracter && caracter <= 235)){
                 str[i] = 101;
             }
             //i
@@ -279,7 +281,7 @@ Tokenizador::PasarAminuscSinAcentosFun(string& str)const{
                 str[i] = 105;
             }
             //o
-            else if(210 <= caracter && caracter <= 215 || 242 <= caracter && caracter <= 246){
+            else if(210 <= caracter && caracter <= 214 || 242 <= caracter && caracter <= 246){
                 str[i] = 111;
             }
             //u
@@ -287,7 +289,7 @@ Tokenizador::PasarAminuscSinAcentosFun(string& str)const{
                 str[i] = 117;
             }
             //y
-            else if(caracter == 152 || caracter == 221){
+            else if(caracter == 255 || caracter == 253 || caracter == 221){
                 str[i] = 121;
             }
             //ñ
@@ -301,53 +303,6 @@ Tokenizador::PasarAminuscSinAcentosFun(string& str)const{
         }
     }
 }
-
-void
-Tokenizador::DetectarUrl(const string& str, list<string>& tokens,string delimitadoresPalabra) const {
-
-    int length = str.length();
-
-    if(length >= 7){
-        if((str.find("ftp:") != std::string::npos && delimiters.find(str[4]) == std::string::npos) ||
-        (str.find("http:") != std::string::npos && delimiters.find(str[5]) == std::string::npos) ||
-        (str.find("https:") != std::string::npos && delimiters.find(str[6]) == std::string::npos)){
-
-        }
-    } else if (length >= 6){
-        if((str.find("ftp:") != std::string::npos && delimiters.find(str[4]) == std::string::npos) ||
-        (str.find("http:") != std::string::npos && delimiters.find(str[5]) == std::string::npos)){
-
-        }
-    } else if (length >= 5){
-        if(str.find("ftp:") != std::string::npos && delimiters.find(str[4]) == std::string::npos){
-
-        }
-    }
-}
-
-/*
-bool
-Tokenizador::DetectarDecimal(list<string>& tokens) const{
-
-}
-
-bool
-Tokenizador::DetectarMail(list<string>& tokens) const{
-
-}
-
-bool
-Tokenizador::DetectarAcronimo(list<string>& tokens) const{
-
-}
-
-bool
-Tokenizador::DetectarGuion(list<string>& tokens) const{
-
-}
- */
-
-
 
 bool
 Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) const {
@@ -491,8 +446,18 @@ Tokenizador::PosiblesCasosEspeciales (string delimitadores) {
     isDecimal =false;
     isUrl = false;
 
+    bool auxDecimal1=false;
+    bool auxDecimal2=false;
+
     for(int i = 0; i < delimitadores.length(); i++){
-        if(!isDecimal && decimal.find(delimitadores[i]) != std::string::npos){
+        if(!auxDecimal1 && delimitadores[i] == '.'){
+            auxDecimal1 = true;
+        }
+        if(!auxDecimal2 && delimitadores[i] == ','){
+            auxDecimal2 = true;
+        }
+
+        if(!isDecimal && auxDecimal1 && auxDecimal2){
             isDecimal = true;
             //cout << "Puede ser decimal" <<endl;
         }
@@ -502,78 +467,3 @@ Tokenizador::PosiblesCasosEspeciales (string delimitadores) {
         }
     }
 }
-
-bool
-Tokenizador::IsNum(string& str) const{
-    if(str.find_first_not_of("0123456789") == std::string::npos){
-        return true;
-    } else return false;
-}
-/*
-list<string>
-Tokenizador::DetectarCasosEspeciales(const char& str) const{
-
-    int length = str.length();
-    //Verificamos que la
-    if ((length >= 5 && str.find("ftp:") != std::string::npos && delimiters.find(str[4]) == std::string::npos) ||
-    (length >= 6 && str.find("http:") != std::string::npos && delimiters.find(str[5]) == std::string::npos) ||
-    (length >= 7 && str.find("https:") != std::string::npos && delimiters.find(str[6]) == std::string::npos)){
-
-        if(length >= 7){
-            if((str.find("ftp:") != std::string::npos && delimiters.find(str[4]) == std::string::npos) ||
-            (str.find("http:") != std::string::npos && delimiters.find(str[5]) == std::string::npos) ||
-            (str.find("https:") != std::string::npos && delimiters.find(str[6]) == std::string::npos)){
-                return "url";
-            }
-        } else if (length >= 6){
-            if((str.find("ftp:") != std::string::npos && delimiters.find(str[4]) == std::string::npos) ||
-               (str.find("http:") != std::string::npos && delimiters.find(str[5]) == std::string::npos)){
-                return "url";
-            }
-        } else if (length >= 5){
-            if(str.find("ftp:") != std::string::npos && delimiters.find(str[4]) == std::string::npos){
-                return "url";
-            }
-        }
-
-        return "url";
-    } else if(str.find_first_not_of("0123456789,.") == std::string::npos) {
-        if(str[str.length()-1] != ','|| str[str.length()-1] != '.'){
-            return "decimal liada";
-        }
-        return "decimal";
-    } else if(){
-
-    }
-}
-*/
-
-
-
-
-/*
-bool
-Tokenizador::DetectarUrl(list<string>& tokens) const{
-
-}
-
-bool
-Tokenizador::DetectarDecimal(list<string>& tokens) const{
-
-}
-
-bool
-Tokenizador::DetectarMail(list<string>& tokens) const{
-
-}
-
-bool
-Tokenizador::DetectarAcronimo(list<string>& tokens) const{
-
-}
-
-bool
-Tokenizador::DetectarGuion(list<string>& tokens) const{
-
-}
-*/
