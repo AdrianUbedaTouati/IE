@@ -67,17 +67,16 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
         if (!casosEspeciales) {
             tokens.push_back(str.substr(primerCaracter, posDelimitador - primerCaracter));
         } else {
-            /*
             if (primerToken) {
                 token = str.substr(primerCaracter, posDelimitador - primerCaracter);
             } else {
                 token = str.substr(primerCaracter - 1, posDelimitador - primerCaracter + 2);
             }
-             */
 
-            token = str.substr(primerCaracter == 0 ? 0 : (primerCaracter - 1),posDelimitador - primerCaracter + (primerCaracter == 0 ? 1 : 2));
-            //cout<<token<<endl;
-            //cout << str.substr(primerCaracter == 0 ? 0 : (primerCaracter - 1), posDelimitador - primerCaracter + (primerCaracter == 0 ? 1 : 2)) << endl;
+            //token = str.substr(primerCaracter == 0 ? 0 : (primerCaracter - 1),posDelimitador - primerCaracter + (primerCaracter == 0 ? 1 : 2));
+            cout<<token<<endl;
+            cout << str.substr(primerCaracter == 0 ? 0 : (primerCaracter - 1),
+                               posDelimitador - primerCaracter + (primerCaracter == 0 ? 1 : 2)) << endl;
 
             if (isUrl && primerToken && (token.find("http:") == 0 || token.find("https:") == 0 || token.find("ftp:") == 0)
                 || (delimitadoresPalabra.find(token[0]) != string::npos && (token.find("http:") == 1
@@ -85,7 +84,7 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
                 TratarURL(str, primerCaracter, posDelimitador, delimitadoresPalabra);
             }
             else if (IsDecimal(token)){
-                //cout << "Soy el token" << token << " y soy un decimal" << endl;
+                cout << "Soy el token" << token << " y soy un decimal" << endl;
                 if (token[0] == '.' || token[0] == ',') {
                     string aux = token;
                     aux = "0" + aux;
@@ -96,14 +95,13 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
                 }
             }else if (token[token.size()-1] == '@') {
                 TratarEmail(str, primerCaracter, posDelimitador, delimitadoresPalabra);
-
-                //cout << "Soy el token" << token << " y soy un mail" << endl;
+                cout << "Soy el token" << token << " y soy un mail" << endl;
             } else if (token[token.size()-1] == '.') {
                 TratarAcronimo(str, primerCaracter, posDelimitador, delimitadoresPalabra);
-                //cout << "Soy el token" << token << " y soy un acronimo" << endl;
+                cout << "Soy el token" << token << " y soy un acronimo" << endl;
             } else if (token[token.size()-1] == '-') {
                 TratarMultipalabra(str, primerCaracter, posDelimitador, delimitadoresPalabra);
-                //cout << "Soy el token" << token << " y soy una multipalabea" << endl;
+                cout << "Soy el token" << token << " y soy una multipalabea" << endl;
             }
             token = str.substr(primerCaracter, posDelimitador - primerCaracter);
             tokens.push_back(token);
@@ -208,7 +206,6 @@ void Tokenizador::TratarMultipalabra(const string &str, size_t &firstPos, size_t
 
 bool
 Tokenizador::IsDecimal(const string &token) const{
-    /*
     if (isDecimal && (token[token.size()-1] == '.' || token[token.size()-1] == ',' || token[token.size()-1] == ' '
     || token[0] == '.' || token[0] == ',' || token[0] == ' ')) {
 
@@ -229,25 +226,6 @@ Tokenizador::IsDecimal(const string &token) const{
 
         return true;
     } else return false;
-     */
-    if (token[0] == ' ' || token[0] == ',' || token[0] == '.' ||
-        token.back() == ' ' || token.back() == ',' || token.back() == '.') {
-        size_t symbol = token.find_first_of("$%", token.size() - 2);
-
-        for (size_t i = 1; i < token.size() - 1; ++i) {
-            if ((token[i] < '0' || token[i] > '9') && token[i] != ',' &&
-                token[i] != '.' && symbol == string::npos) {
-                return false;
-            }
-        }
-
-        if (symbol != string::npos && token.size() == 3) {
-            return false;
-        }
-
-        return true;
-    }
-    return false;
 }
 
 
@@ -488,11 +466,11 @@ Tokenizador::PosiblesCasosEspeciales (string delimitadores) {
     for(int i = 0; i < delimitadores.length(); i++){
         if(!isDecimal && decimal.find(delimitadores[i]) != std::string::npos){
             isDecimal = true;
-            //cout << "Puede ser decimal" <<endl;
+            cout << "Puede ser decimal" <<endl;
         }
         if(!isUrl && URL.find_first_of(delimitadores[i]) != std::string::npos){
             isUrl = true;
-            //cout << "Puede ser url" <<endl;
+            cout << "Puede ser url" <<endl;
         }
     }
 }
