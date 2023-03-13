@@ -134,12 +134,12 @@ Tokenizador::TratarEmail(const string &str,string& delimitadoresPalabra, size_t&
     for(size_t indice = posDelimitador; indice < str.length();) {
         indice++;
         indice = str.find_first_of(delimitadoresPalabra, indice);
-        if (indice == str.find('@', indice)) { // mas de 1 @
+        if (indice == str.find('@', indice)) {
             break;
-        } else if (indice != str.find_first_of(deilimitadoresEspeciales, indice)) {
+        }else if (indice != str.find_first_of(deilimitadoresEspeciales, indice)) {
             posDelimitador = indice;
             break;
-        } else if (indice == string::npos) {
+        }else if (indice == string::npos) {
             if (posDelimitador != str.size() - 1) {
                 posDelimitador = str.size();
             }
@@ -149,28 +149,25 @@ Tokenizador::TratarEmail(const string &str,string& delimitadoresPalabra, size_t&
 }
 
 void
-Tokenizador::TratarAcronimo (const string &str,string& delimitadoresPalabra,size_t& posDelimitador){
-    size_t indice = posDelimitador;
-    do {
-        indice ++;
+Tokenizador::TratarAcronimo (const string &str,string& delimitadoresPalabra,size_t& posDelimitador) {
+    for (size_t indice = posDelimitador; indice < str.length();) {
+        indice++;
         indice = str.find_first_of(delimitadoresPalabra, indice);
-        if (indice == string::npos) {
-            if (posDelimitador + 1 != str.size()) {
-                posDelimitador = str.size();
-            }
-            break;
-        } else if (indice != str.find('.', indice)) {
+        if (indice != str.find('.', indice)) {
             if (indice != posDelimitador + 1) {
                 posDelimitador = indice;
             }
             break;
-        } else {
-            if (indice == posDelimitador + 1) { // no se guarda el ultimo .
-                break;
+        } else if (indice == string::npos) {
+            if (posDelimitador != str.size() - 1) {
+                posDelimitador = str.size();
             }
-            posDelimitador = indice;
+            break;
+        } else if (indice - 1 == posDelimitador) { // no se guarda el ultimo .
+            break;
         }
-    } while (str.length());
+        posDelimitador = indice;
+    }
 }
 
 void

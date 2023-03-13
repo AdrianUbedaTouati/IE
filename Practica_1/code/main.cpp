@@ -15,10 +15,15 @@ int main() {
 
     list<string> lt1, lt2;
 
-    Tokenizador a("@.", true, false);
+    Tokenizador a("@.&", true, false);
     list<string> tokens;
 
-    a.Tokenizar("cat@iuii.ua.es@cd", tokens);
-    imprimirListaSTL(tokens);
+    a.Tokenizar("U..S.A p1 e..g. p2. La", lt1);
+    imprimirListaSTL(lt1);
 
+    a.Tokenizar("...U.S.A p1 e..g. p2. La", lt1);
+    imprimirListaSTL(lt1);
+
+    a.Tokenizar("Hack.4.Good p1 ", lt1);
+    imprimirListaSTL(lt1);
 }
