@@ -49,17 +49,17 @@ cmake_ninja_workdir = C$:/Users/andri/CLionProjects/IE/Practica_1/cmake-build-de
 
 build cmake_object_order_depends_target_Practica_1: phony || CMakeFiles/Practica_1.dir
 
-build CMakeFiles/Practica_1.dir/code/main.cpp.obj: CXX_COMPILER__Practica_1_Debug C$:/Users/andri/CLionProjects/IE/Practica_1/code/main.cpp || cmake_object_order_depends_target_Practica_1
-  DEP_FILE = CMakeFiles\Practica_1.dir\code\main.cpp.obj.d
+build CMakeFiles/Practica_1.dir/code/src/main.cpp.obj: CXX_COMPILER__Practica_1_Debug C$:/Users/andri/CLionProjects/IE/Practica_1/code/src/main.cpp || cmake_object_order_depends_target_Practica_1
+  DEP_FILE = CMakeFiles\Practica_1.dir\code\src\main.cpp.obj.d
   FLAGS = -g -fdiagnostics-color=always -std=gnu++11
   OBJECT_DIR = CMakeFiles\Practica_1.dir
-  OBJECT_FILE_DIR = CMakeFiles\Practica_1.dir\code
+  OBJECT_FILE_DIR = CMakeFiles\Practica_1.dir\code\src
 
-build CMakeFiles/Practica_1.dir/code/Tokenizador.cpp.obj: CXX_COMPILER__Practica_1_Debug C$:/Users/andri/CLionProjects/IE/Practica_1/code/Tokenizador.cpp || cmake_object_order_depends_target_Practica_1
-  DEP_FILE = CMakeFiles\Practica_1.dir\code\Tokenizador.cpp.obj.d
+build CMakeFiles/Practica_1.dir/code/lib/Tokenizador.cpp.obj: CXX_COMPILER__Practica_1_Debug C$:/Users/andri/CLionProjects/IE/Practica_1/code/lib/Tokenizador.cpp || cmake_object_order_depends_target_Practica_1
+  DEP_FILE = CMakeFiles\Practica_1.dir\code\lib\Tokenizador.cpp.obj.d
   FLAGS = -g -fdiagnostics-color=always -std=gnu++11
   OBJECT_DIR = CMakeFiles\Practica_1.dir
-  OBJECT_FILE_DIR = CMakeFiles\Practica_1.dir\code
+  OBJECT_FILE_DIR = CMakeFiles\Practica_1.dir\code\lib
 
 
 # =============================================================================
@@ -69,7 +69,7 @@ build CMakeFiles/Practica_1.dir/code/Tokenizador.cpp.obj: CXX_COMPILER__Practica
 #############################################
 # Link the executable Practica_1.exe
 
-build Practica_1.exe: CXX_EXECUTABLE_LINKER__Practica_1_Debug CMakeFiles/Practica_1.dir/code/main.cpp.obj CMakeFiles/Practica_1.dir/code/Tokenizador.cpp.obj
+build Practica_1.exe: CXX_EXECUTABLE_LINKER__Practica_1_Debug CMakeFiles/Practica_1.dir/code/src/main.cpp.obj CMakeFiles/Practica_1.dir/code/lib/Tokenizador.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Practica_1.dir
