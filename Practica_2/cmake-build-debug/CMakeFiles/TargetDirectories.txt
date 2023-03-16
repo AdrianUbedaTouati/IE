@@ -1,0 +1,3 @@
+C:/Users/andri/CLionProjects/IE/Practica_2/cmake-build-debug/CMakeFiles/Practica_2.dir
+C:/Users/andri/CLionProjects/IE/Practica_2/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/andri/CLionProjects/IE/Practica_2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
