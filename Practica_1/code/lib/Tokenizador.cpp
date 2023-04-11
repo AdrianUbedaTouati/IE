@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Tokenizador::Tokenizador (const char* delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos) {
+Tokenizador::Tokenizador (const string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos) {
     string aux= delimitadoresPalabra;
     delimiters = PreparacionDelimitadores(aux);
     casosEspeciales = kcasosEspeciales;
@@ -41,7 +41,7 @@ ostream& operator<<(ostream& os, const Tokenizador& tokenizador) {
 }
 
 void
-Tokenizador::Tokenizar (const char* str1, list<string>& tokens) {
+Tokenizador::Tokenizar (const string& str1, list<string>& tokens) {
     string str = str1;
     tokens.clear();
     string delimitadores = delimiters;
@@ -68,7 +68,6 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
         if (!casosEspeciales) {
             tokens.push_back(str.substr(primerCaracter, posDelimitador - primerCaracter));
         } else {
-
             if (primerToken) {
                 token = str.substr(primerCaracter, posDelimitador - primerCaracter + 1);
             } else {
@@ -305,10 +304,8 @@ Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) {
     {
         while(!i.eof())
         {
-            //leer todo el fichero?
             cadena="";
             getline(i, cadena);
-            //Verifica que no haya de longitud 0
             char aux[cadena.length()];
             for ( int i = 0; i <cadena.length();i++){
                 aux[i]=cadena[i];
@@ -321,10 +318,11 @@ Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) {
     }
     i.close();
     f.open(NomFichSal.c_str());
+    //Mejor un solo string
     list<string>::iterator itS;
     for(itS= tokens.begin();itS!= tokens.end();itS++)
     {
-        f << (*itS) << endl;
+        f << (*itS) << '/n';
     }
     f.close();
     return true;
