@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <list>
+#include <unordered_set>
 
 class IndexadorHash {
 

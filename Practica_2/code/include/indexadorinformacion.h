@@ -2,7 +2,6 @@
 #define PRACTICA_2_INDEXADORINFORMACION_H
 
 class IndexadorInformacion{
-
     class InformacionTermino {
             friend ostream& operator<<(ostream& s, const InformacionTermino& p);
             ostream& operator<<(ostream& s, const InformacionTermino& p) {
@@ -35,7 +34,6 @@ class IndexadorInformacion{
 
     class InfTermDoc {
         friend ostream &operator<<(ostream &s, const InfTermDoc &p);
-
         ostream& operator<<(ostream& s, const InfTermDoc& p) {
             s << "ft: " << p.ft;
             /* A continuación se mostrarían todos los elementos de p.posTerm
@@ -72,9 +70,7 @@ class IndexadorInformacion{
     };
 
     class InfDoc {
-
         friend ostream& operator<<(ostream& s, const InfDoc& p);
-
         ostream& operator<<(ostream& s, const InfDoc& p) {
             s << "idDoc: " << p.idDoc << "\tnumPal: " << p.numPal <<
               "\tnumPalSinParada: " << p.numPalSinParada << "\tnumPalDiferentes: " <<
@@ -114,7 +110,7 @@ class IndexadorInformacion{
 
     class InfColeccionDocs {
         friend ostream& operator<<(ostream& s, const InfColeccionDocs& p);
-        ostream& operator<<(ostream&, const InfColeccionDocs&){
+        ostream& operator<<(ostream& s, const InfColeccionDocs& p){
             s << "numDocs: " << p.numDocs << "\tnumTotalPal: " << p.numTotalPal <<
               "\tnumTotalPalSinParada: " << p.numTotalPalSinParada <<
               "\tnumTotalPalDiferentes: " << numTotalPalDiferentes << "\ttamBytes: " <<
@@ -181,30 +177,31 @@ class IndexadorInformacion{
     class InformacionPregunta {
         friend ostream& operator<<(ostream& s, const InformacionPregunta& p);
 
-        ostream& operator<<(ostream&, const InformacionPregunta&){
+        ostream& operator<<(ostream& s, const InformacionPregunta& p){
             s << "numTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: "<<
               p.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << numTotalPalDiferentes;
             return s;
         }
-    public:
-        InformacionPregunta (const InformacionPregunta &);
-        InformacionPregunta ();
-        ~InformacionPregunta ();
-        InformacionPregunta & operator= (const InformacionPregunta &);
 
-    private:
-        // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
+        public:
+            InformacionPregunta (const InformacionPregunta &);
+            InformacionPregunta ();
+            ~InformacionPregunta ();
+            InformacionPregunta & operator= (const InformacionPregunta &);
 
-        // Nº total de palabras en la pregunta
-        int numTotalPal;
+        private:
+            // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
 
-        // Nº total de palabras sin stop-words en la pregunta
-        int numTotalPalSinParada;
+            // Nº total de palabras en la pregunta
+            int numTotalPal;
 
-        /* Nº total de palabras diferentes en la pregunta que no sean stop-words
-         * (sin acumular la frecuencia de cada una de ellas)
-         * */
-        int numTotalPalDiferentes;
+            // Nº total de palabras sin stop-words en la pregunta
+            int numTotalPalSinParada;
+
+            /* Nº total de palabras diferentes en la pregunta que no sean stop-words
+             * (sin acumular la frecuencia de cada una de ellas)
+             * */
+            int numTotalPalDiferentes;
     };
 };
 

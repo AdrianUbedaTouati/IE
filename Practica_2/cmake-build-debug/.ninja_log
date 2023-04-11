@@ -1,10 +1,7 @@
 # ninja log v5
-1	336	7006601891165007	CMakeFiles/Practica_2.dir/main.cpp.obj	63e49220d8efbd4f
-1	164	7029115455743624	build.ninja	7a65252ae6057b59
+1	164	7029130957187914	build.ninja	7a65252ae6057b59
 3	119	7006611249165727	Practica_2.exe	31083ff5a15d0f85
 1	332	7006603565243554	CMakeFiles/Practica_2.dir/code/src/main.cpp.obj	e2dd948c677903ba
 4	70	7006610057320908	CMakeFiles/Practica_2.dir/code/lib/indexadorHash.cpp.obj	181c5ae043ba162a
-11	76	7006610057390882	CMakeFiles/Practica_2.dir/code/lib/indexadorInformacion.cpp.obj	aa80ea5724af8924
 16	566	7006610062276988	CMakeFiles/Practica_2.dir/code/lib/tokenizador.cpp.obj	17210b4157c68c7f
-3	332	7006610785919477	CMakeFiles/Practica_2.dir/Tests/prueba.cpp.obj	76a1ded538e6a29f
 4	55	7006611052482145	CMakeFiles/Practica_2.dir/code/lib/stemmer.cpp.obj	81c3ef66b16d75fe
