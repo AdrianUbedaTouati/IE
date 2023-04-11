@@ -85,6 +85,12 @@ build CMakeFiles/Practica_2.dir/code/lib/informacionTerminoPregunta.cpp.obj: CXX
   OBJECT_DIR = CMakeFiles\Practica_2.dir
   OBJECT_FILE_DIR = CMakeFiles\Practica_2.dir\code\lib
 
+build CMakeFiles/Practica_2.dir/code/lib/informacionPregunta.cpp.obj: CXX_COMPILER__Practica_2_Debug C$:/Users/andri/CLionProjects/IE/Practica_2/code/lib/informacionPregunta.cpp || cmake_object_order_depends_target_Practica_2
+  DEP_FILE = CMakeFiles\Practica_2.dir\code\lib\informacionPregunta.cpp.obj.d
+  FLAGS = -g -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles\Practica_2.dir
+  OBJECT_FILE_DIR = CMakeFiles\Practica_2.dir\code\lib
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target Practica_2
@@ -93,7 +99,7 @@ build CMakeFiles/Practica_2.dir/code/lib/informacionTerminoPregunta.cpp.obj: CXX
 #############################################
 # Link the executable Practica_2.exe
 
-build Practica_2.exe: CXX_EXECUTABLE_LINKER__Practica_2_Debug CMakeFiles/Practica_2.dir/code/src/main.cpp.obj CMakeFiles/Practica_2.dir/code/lib/indexadorHash.cpp.obj CMakeFiles/Practica_2.dir/code/lib/stemmer.cpp.obj CMakeFiles/Practica_2.dir/code/lib/indexadorInformacion.cpp.obj CMakeFiles/Practica_2.dir/code/lib/tokenizador.cpp.obj CMakeFiles/Practica_2.dir/code/lib/informacionTerminoPregunta.cpp.obj
+build Practica_2.exe: CXX_EXECUTABLE_LINKER__Practica_2_Debug CMakeFiles/Practica_2.dir/code/src/main.cpp.obj CMakeFiles/Practica_2.dir/code/lib/indexadorHash.cpp.obj CMakeFiles/Practica_2.dir/code/lib/stemmer.cpp.obj CMakeFiles/Practica_2.dir/code/lib/indexadorInformacion.cpp.obj CMakeFiles/Practica_2.dir/code/lib/tokenizador.cpp.obj CMakeFiles/Practica_2.dir/code/lib/informacionTerminoPregunta.cpp.obj CMakeFiles/Practica_2.dir/code/lib/informacionPregunta.cpp.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\Practica_2.dir
