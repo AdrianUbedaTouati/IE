@@ -43,7 +43,7 @@ ostream& operator<<(ostream& s, const InfDoc& p) {
 ostream& operator<<(ostream& s, const InfColeccionDocs& p){
     s << "numDocs: " << p.numDocs << "\tnumTotalPal: " << p.numTotalPal <<
       "\tnumTotalPalSinParada: " << p.numTotalPalSinParada <<
-      "\tnumTotalPalDiferentes: " << numTotalPalDiferentes << "\ttamBytes: " <<
+      "\tnumTotalPalDiferentes: " << p.numTotalPalDiferentes << "\ttamBytes: " <<
       p.tamBytes;
     return s;
 }
@@ -66,6 +66,6 @@ ostream& operator<<(ostream& s, const InformacionTerminoPregunta& p) {
 
 ostream& operator<<(ostream& s, const InformacionPregunta& p){
     s << "numTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: "<<
-      p.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << numTotalPalDiferentes;
+      p.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << p.numTotalPalDiferentes;
     return s;
 }
