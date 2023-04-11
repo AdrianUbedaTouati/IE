@@ -1,6 +1,6 @@
 # ninja log v5
 1	336	7006601891165007	CMakeFiles/Practica_2.dir/main.cpp.obj	63e49220d8efbd4f
-1	164	7006612233336197	build.ninja	7a65252ae6057b59
+1	164	7029110587684470	build.ninja	7a65252ae6057b59
 3	119	7006611249165727	Practica_2.exe	31083ff5a15d0f85
 1	332	7006603565243554	CMakeFiles/Practica_2.dir/code/src/main.cpp.obj	e2dd948c677903ba
 4	70	7006610057320908	CMakeFiles/Practica_2.dir/code/lib/indexadorHash.cpp.obj	181c5ae043ba162a

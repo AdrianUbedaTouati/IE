@@ -389,4 +389,4 @@ private:
 
 };
 
-#endif PRACTICA_2_INDEXADORHASH_H
+#endif //PRACTICA_2_INDEXADORHASH_H
