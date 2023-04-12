@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Tokenizador::Tokenizador (const char* delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos) {
+Tokenizador::Tokenizador (const string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos) {
     string aux= delimitadoresPalabra;
     delimiters = PreparacionDelimitadores(aux);
     casosEspeciales = kcasosEspeciales;
@@ -36,12 +36,12 @@ Tokenizador
 
 ostream& operator<<(ostream& os, const Tokenizador& tokenizador) {
     os << "DELIMITADORES: " << tokenizador.delimiters << " TRATA CASOS ESPECIALES: " <<
-    tokenizador.casosEspeciales << " PASAR A MINUSCULAS Y SIN ACENTOS: " << tokenizador.pasarAminuscSinAcentos;
+       tokenizador.casosEspeciales << " PASAR A MINUSCULAS Y SIN ACENTOS: " << tokenizador.pasarAminuscSinAcentos;
     return os;
 }
 
 void
-Tokenizador::Tokenizar (const char* str1, list<string>& tokens) {
+Tokenizador::Tokenizar (const string& str1, list<string>& tokens) {
     string str = str1;
     tokens.clear();
     string delimitadores = delimiters;
@@ -68,7 +68,6 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
         if (!casosEspeciales) {
             tokens.push_back(str.substr(primerCaracter, posDelimitador - primerCaracter));
         } else {
-
             if (primerToken) {
                 token = str.substr(primerCaracter, posDelimitador - primerCaracter + 1);
             } else {
@@ -77,7 +76,7 @@ Tokenizador::AuxTokenizar (const string& str, list<string>& tokens,string delimi
 
             if (isUrl && primerToken && (token.find("http:") == 0 || token.find("https:") == 0 || token.find("ftp:") == 0)
                 || (delimitadoresPalabra.find(token[0]) != string::npos && (token.find("http:") == 1
-                || token.find("https:") == 1 ||token.find("ftp:") == 1))) {
+                                                                            || token.find("https:") == 1 ||token.find("ftp:") == 1))) {
                 TratarURL(str, delimitadoresPalabra, posDelimitador);
             }
             else if (IsDecimal(token)){
@@ -221,7 +220,7 @@ Tokenizador::TratarMultipalabra(const string &str,string& delimitadoresPalabra, 
 bool
 Tokenizador::IsDecimal(const string &token) const{
     if (isDecimal && (token[token.size()-1] == '.' || token[token.size()-1] == ',' || token[token.size()-1] == ' '
-    || token[0] == '.' || token[0] == ',' || token[0] == ' ')) {
+                      || token[0] == '.' || token[0] == ',' || token[0] == ' ')) {
         size_t caracter = token.find_first_of("$%", token.size() - 2);
 
         if (caracter != string::npos && token.size() == 3) {
@@ -249,7 +248,7 @@ Tokenizador::PasarAminuscSinAcentosFun(string& str)const{
         if(caracter >= 97 && caracter <= 122){
             continue;
         }
-        //A hasta Z
+            //A hasta Z
         else if(caracter >= 65 && caracter <= 90){
             //poner a minuscula
             str[i] = caracter + 32;
@@ -258,31 +257,31 @@ Tokenizador::PasarAminuscSinAcentosFun(string& str)const{
             if ((192 <= caracter && caracter <= 197) || (224 <= caracter && caracter  <= 229)) {
                 str[i] = 97;
             }
-            //e
+                //e
             else if((200 <= caracter && caracter <= 203) || (232 <= caracter && caracter <= 235)){
                 str[i] = 101;
             }
-            //i
+                //i
             else if(204 <= caracter && caracter <= 207 || 236 <= caracter && caracter <= 239){
                 str[i] = 105;
             }
-            //o
+                //o
             else if(210 <= caracter && caracter <= 214 || 242 <= caracter && caracter <= 246){
                 str[i] = 111;
             }
-            //u
+                //u
             else if(217 <= caracter && caracter <= 220 || 249 <= caracter && caracter <= 252){
                 str[i] = 117;
             }
-            //y
+                //y
             else if(caracter == 255 || caracter == 253 || caracter == 221){
                 str[i] = 121;
             }
-            //ñ
+                //ñ
             else if(caracter == 209){
                 str[i] = 241;
             }
-            //ç
+                //ç
             else if(caracter == 231 || caracter == 199){
                 str[i] = 99;
             }
@@ -305,10 +304,8 @@ Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) {
     {
         while(!i.eof())
         {
-            //leer todo el fichero?
             cadena="";
             getline(i, cadena);
-            //Verifica que no haya de longitud 0
             char aux[cadena.length()];
             for ( int i = 0; i <cadena.length();i++){
                 aux[i]=cadena[i];
@@ -321,11 +318,14 @@ Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) {
     }
     i.close();
     f.open(NomFichSal.c_str());
+    //Mejor un solo string
     list<string>::iterator itS;
+    cadena = "";
     for(itS= tokens.begin();itS!= tokens.end();itS++)
     {
-        f << (*itS) << endl;
+        cadena = (*itS) + "/n";
     }
+    f << cadena;
     f.close();
     return true;
 }

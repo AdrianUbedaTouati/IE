@@ -5,6 +5,8 @@
 #include <list>
 #include <unordered_set>
 #include "indexadorinformacion.h"
+#include "tokenizador.h"
+#include "indexadorinformacion.h"
 
 class IndexadorHash {
 
@@ -401,6 +403,12 @@ private:
      * dentro del documento en la clase InfTermDoc
      * */
     bool almacenarPosTerm;
+
+    //Añadido
+
+    unordered_map<string, int> auxDisco;
+
+    void ObtenerInfo();
 };
 
 #endif //PRACTICA_2_INDEXADORHASH_H

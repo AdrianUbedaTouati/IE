@@ -36,7 +36,7 @@ public:
      * casosEspeciales a kcasosEspeciales; pasarAminuscSinAcentos a
      * minuscSinAcentos
      */
-    Tokenizador (const char* delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
+    Tokenizador (const string& delimitadoresPalabra, const bool& kcasosEspeciales, const bool& minuscSinAcentos);
 
     /**
      * Constructor de copia
@@ -63,7 +63,7 @@ public:
      * Tokeniza str devolviendo el resultado en tokens. La lista tokens se
      * vaciará antes de almacenar el resultado de la tokenización.
      */
-    void Tokenizar (const char* str1, list<string>& tokens);
+    void Tokenizar (const string& str1, list<string>& tokens);
 
     /**
      * Tokeniza el fichero i guardando la salida en el fichero f (una
@@ -207,7 +207,6 @@ private:
 
 
     void TratarMultipalabra(const string&,string&, size_t&);
-
 };
 
 #endif /*PRACTICA_1_TOKENIZADOR_H*/
