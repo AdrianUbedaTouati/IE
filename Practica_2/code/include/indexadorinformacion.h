@@ -24,6 +24,13 @@ public:
 
     InfTermDoc &operator=(const InfTermDoc &);
 
+    //Auxiliares
+    void setFt(int aux){ft = aux;}
+    int getFt(){return ft;}
+
+    void setPosTerm(list<int> aux){posTerm = aux;}
+    list<int> getPosTerm(){return posTerm;}
+
 private:
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
 
@@ -52,6 +59,13 @@ class InformacionTermino {
         // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
         InformacionTermino & operator= (const InformacionTermino &);
 
+        //Auxiliares
+        void setFtc(int aux){ftc = aux;}
+        int getFtc(){return ftc;}
+
+        void setL_docs(unordered_map<int, InfTermDoc> aux){l_docs = aux;}
+        unordered_map<int, InfTermDoc> getL_docs(){return l_docs;}
+
     private:
         // Frecuencia total del término en la colección
         int ftc;
@@ -73,6 +87,25 @@ public:
     InfDoc ();
     ~InfDoc ();
     InfDoc & operator= (const InfDoc &);
+
+    //Auxiliares
+    void setIdDoc(int aux){idDoc = aux;}
+    int getIdDoc(){return idDoc;}
+
+    void setNumPal(int aux){numPal = aux;}
+    int getNumPal(){return numPal;}
+
+    void setNumPalSinParada(int aux){numPalSinParada = aux;}
+    int getNumPalSinParada(){return numPalSinParada;}
+
+    void setNumPalDiferentes(int aux){numPalDiferentes = aux;}
+    int getNumPalDiferentes(){return numPalDiferentes;}
+
+    void setTamBytes(int aux){tamBytes = aux;}
+    int getTamBytes(){return tamBytes;}
+
+    void setFechaModificacion(time_t aux){fechaModificacion = aux;}
+    time_t getFechaModificacion(){return fechaModificacion;}
 
 private:
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
@@ -107,6 +140,22 @@ public:
     ~InfColeccionDocs ();
     InfColeccionDocs & operator= (const InfColeccionDocs &);
 
+    //Auxiliares
+    void setNumDocs(int aux){numDocs = aux;}
+    int getNumDocs(){return numDocs;}
+
+    void setNumTotalPal(int aux){numTotalPal = aux;}
+    int getNumTotalPal(){return numTotalPal;}
+
+    void setNumTotalPalSinParada(int aux){numTotalPalSinParada = aux;}
+    int getNumTotalPalSinParada(){return numTotalPalSinParada;}
+
+    void setNumTotalPalDiferentes(int aux){numTotalPalDiferentes = aux;}
+    int getNumTotalPalDiferentes(){return numTotalPalDiferentes;}
+
+    void setTamBytes(int aux){tamBytes = aux;}
+    int getTamBytes(){return tamBytes;}
+
 private:
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
 
@@ -137,6 +186,13 @@ public:
     ~InformacionTerminoPregunta ();
     InformacionTerminoPregunta & operator= (const InformacionTerminoPregunta &);
 
+    //Auxiliares
+    void setFt(int aux){ft = aux;}
+    int getFt(){return ft;}
+
+    void setPosTerm(list<int> aux){posTerm = aux;}
+    list<int> getPosTerm(){return posTerm;}
+
 private:
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
 
@@ -160,6 +216,16 @@ class InformacionPregunta {
         InformacionPregunta ();
         ~InformacionPregunta ();
         InformacionPregunta & operator= (const InformacionPregunta &);
+
+    //Auxiliares
+    void setNumTotalPal(int aux){numTotalPal = aux;}
+    int getNumTotalPal(){return numTotalPal;}
+
+    void setNumTotalPalSinParada(int aux){numTotalPalSinParada = aux;}
+    int getNumTotalPalSinParada(){return numTotalPalSinParada;}
+
+    void setNumTotalPalDiferentes(int aux){numTotalPalDiferentes = aux;}
+    int getNumTotalPalDiferentes(){return numTotalPalDiferentes;}
 
     private:
         // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
