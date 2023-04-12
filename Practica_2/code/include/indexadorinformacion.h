@@ -25,7 +25,12 @@ public:
     InfTermDoc &operator=(const InfTermDoc &);
 
     //Auxiliares
-    void setPosTerm(list<int> aux){posTerm = aux;}
+    void AumentoFt(){ft++;}
+
+    void nuevoPosTerm(const int& pos){posTerm.push_back(pos);posTerm.sort(less<int>());}
+
+    //Seters/Geters
+    void setPosTerm(list<int> aux){aux.sort(less<int>());posTerm = aux;}
     list<int> getPosTerm(){return posTerm;}
 
     void setFt(int aux){ft = aux;}
@@ -60,6 +65,13 @@ class InformacionTermino {
         InformacionTermino & operator= (const InformacionTermino &);
 
         //Auxiliares
+        void aumentoFtc(){ftc++;}
+
+        void nuevoL_docs(int &id, InfTermDoc &doc) {
+            l_docs.insert(pair<int, InfTermDoc>(id, doc));
+        }
+
+        //Seters/Geters
         void setL_docs(unordered_map<int, InfTermDoc> aux){l_docs = aux;}
         unordered_map<int, InfTermDoc> getL_docs(){return l_docs;}
 
@@ -187,6 +199,11 @@ public:
     InformacionTerminoPregunta & operator= (const InformacionTerminoPregunta &);
 
     //Auxiliares
+    void aumentoFt() {ft++;}
+
+    void nuevoPosTerm(int pos) {posTerm.push_back(pos);}
+
+    //Seters/Geters
     void setFt(int aux){ft = aux;}
     int getFt(){return ft;}
 

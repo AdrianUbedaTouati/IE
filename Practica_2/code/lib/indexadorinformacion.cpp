@@ -196,6 +196,34 @@ ostream& operator<<(ostream& s, const InfColeccionDocs& p){
 * InformacionTerminoPregunta
 */
 
+InformacionTerminoPregunta::InformacionTerminoPregunta(const InformacionTerminoPregunta& aux) {
+    ft = aux.ft;
+    posTerm = aux.posTerm;
+}
+
+InformacionTerminoPregunta::InformacionTerminoPregunta(){
+    ft = 0;
+}
+
+InformacionTerminoPregunta::~InformacionTerminoPregunta(){
+    ft = 0;
+    posTerm.clear();
+}
+
+InformacionTerminoPregunta
+&InformacionTerminoPregunta::operator=(const InformacionTerminoPregunta& aux){
+    if (this == &aux) {
+        return *this;
+    }else{
+        (*this).~InformacionTerminoPregunta();
+
+        ft = aux.ft;
+        posTerm = aux.posTerm;
+
+        return *this;
+    }
+}
+
 ostream& operator<<(ostream& s, const InformacionTerminoPregunta& p) {
     s << "ft: " << p.ft;
     // A continuación se mostrarían todos los elementos de p.posTerm (“posicion
@@ -207,6 +235,40 @@ ostream& operator<<(ostream& s, const InformacionTerminoPregunta& p) {
 /**
 * InformacionPregunta
 */
+
+InformacionPregunta::InformacionPregunta(const InformacionPregunta& aux) {
+    numTotalPalSinParada = aux.numTotalPalSinParada;
+    numTotalPal = aux.numTotalPal;
+    numTotalPalDiferentes = aux.numTotalPalDiferentes;
+
+}
+
+InformacionPregunta::InformacionPregunta(){
+    numTotalPalSinParada = 0;
+    numTotalPal = 0;
+    numTotalPalDiferentes = 0;
+}
+
+InformacionPregunta::~InformacionPregunta(){
+    numTotalPalSinParada = 0;
+    numTotalPal = 0;
+    numTotalPalDiferentes = 0;
+}
+
+InformacionPregunta
+&InformacionPregunta::operator=(const InformacionPregunta& aux){
+    if (this == &aux) {
+        return *this;
+    }else{
+        (*this).~InformacionPregunta();
+
+        numTotalPalSinParada = aux.numTotalPalSinParada;
+        numTotalPal = aux.numTotalPal;
+        numTotalPalDiferentes = aux.numTotalPalDiferentes;
+
+        return *this;
+    }
+}
 
 ostream& operator<<(ostream& s, const InformacionPregunta& p){
     s << "numTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: "<<
