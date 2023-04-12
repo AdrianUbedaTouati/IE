@@ -4,6 +4,34 @@
  * InfTermDoc
  */
 
+InfTermDoc::InfTermDoc(const InfTermDoc& aux){
+    ft = aux.ft;
+    posTerm = aux.posTerm;
+}
+
+InfTermDoc::InfTermDoc(){
+    ft = 0;
+}
+
+InfTermDoc::~InfTermDoc(){
+    ft = 0;
+    posTerm.clear();
+}
+
+InfTermDoc
+&InfTermDoc::operator=(const InfTermDoc& aux){
+    if (this == &aux) {
+        return *this;
+    }else{
+        (*this).~InfTermDoc();
+
+        ft = aux.ft;
+        posTerm = aux.posTerm;
+
+        return *this;
+    }
+}
+
 ostream& operator<<(ostream& s, const InfTermDoc& p) {
     s << "ft: " << p.ft;
     /* A continuación se mostrarían todos los elementos de p.posTerm
@@ -17,6 +45,34 @@ ostream& operator<<(ostream& s, const InfTermDoc& p) {
  * InformacionTermino
  */
 
+InformacionTermino::InformacionTermino(const InformacionTermino& aux){
+    ftc = aux.ftc;
+    l_docs = aux.l_docs;
+}
+
+InformacionTermino::InformacionTermino(){
+    ftc = 0;
+}
+
+InformacionTermino::~InformacionTermino(){
+    ftc = 0;
+    l_docs.clear();
+}
+
+InformacionTermino
+&InformacionTermino::operator=(const InformacionTermino& aux){
+    if (this == &aux) {
+        return *this;
+    }else{
+        (*this).~InformacionTermino();
+
+        ftc = aux.ftc;
+        l_docs = aux.l_docs;
+
+        return *this;
+    }
+}
+
 ostream& operator<<(ostream& s, const InformacionTermino& p) {
     s << "Frecuencia total: " << p.ftc << "\tfd: " << p.l_docs.size();
     /* A continuación se mostrarían todos los elementos de p.l_docs: s <<
@@ -29,6 +85,51 @@ ostream& operator<<(ostream& s, const InformacionTermino& p) {
  * InfDoc
  */
 
+InfDoc::InfDoc(const InfDoc& aux) {
+    fechaModificacion = aux.fechaModificacion;
+    numPal = aux.numPal;
+    idDoc = aux.idDoc;
+    numPalSinParada = aux.numPalSinParada;
+    numPalDiferentes = aux.numPalDiferentes;
+    tamBytes = aux.tamBytes;
+}
+
+InfDoc::InfDoc(time_t auxFechaModificacion,int auxNumPalDiferentres, int auxTamBytes, int auxNumPalSinParada,int auxIdDoc ,int auxNumPal){
+    fechaModificacion = auxFechaModificacion;
+    numPal = auxNumPal;
+    idDoc = auxIdDoc;
+    numPalSinParada = auxNumPalSinParada;
+    numPalDiferentes = auxNumPalDiferentres;
+    tamBytes = auxTamBytes;
+}
+
+InfDoc::~InfDoc(){
+    fechaModificacion = time(0) ;
+    numPal = 0;
+    idDoc = 0;
+    numPalSinParada = 0;
+    numPalDiferentes = 0;
+    tamBytes = 0;
+}
+
+InfDoc
+&InfDoc::operator=(const InfDoc& aux){
+    if (this == &aux) {
+        return *this;
+    }else{
+        (*this).~InfDoc();
+
+        idDoc = aux.idDoc;
+        numPal = aux.numPal;
+        numPalSinParada = aux.numPalSinParada;
+        numPalDiferentes = aux.numPalDiferentes;
+        tamBytes = aux.tamBytes;
+        fechaModificacion = aux.fechaModificacion;
+
+        return *this;
+    }
+}
+
 ostream& operator<<(ostream& s, const InfDoc& p) {
     s << "idDoc: " << p.idDoc << "\tnumPal: " << p.numPal <<
       "\tnumPalSinParada: " << p.numPalSinParada << "\tnumPalDiferentes: " <<
@@ -39,6 +140,49 @@ ostream& operator<<(ostream& s, const InfDoc& p) {
 /**
  * InfColeccionDocs
  */
+
+
+InfColeccionDocs::InfColeccionDocs(const InfColeccionDocs& aux) {
+    tamBytes = aux.tamBytes;
+    numTotalPalSinParada = aux.numTotalPalSinParada;
+    numTotalPalDiferentes = aux.numTotalPalDiferentes;
+    numDocs = aux.numDocs;
+    numTotalPal = aux.numTotalPal;
+
+}
+
+InfColeccionDocs::InfColeccionDocs(int auxNumTotalPalDiferentes, int auxTamBytes, int auxNumTotalPalSinParada,int auxNumDocs ,int auxNumTotalPal){
+    tamBytes = auxTamBytes;
+    numTotalPalSinParada = auxNumTotalPalSinParada;
+    numTotalPalDiferentes = auxNumTotalPalDiferentes;
+    numTotalPal = auxNumTotalPal;
+    numDocs = auxNumDocs;
+}
+
+InfColeccionDocs::~InfColeccionDocs(){
+    tamBytes = 0;
+    numTotalPalSinParada = 0;
+    numTotalPalDiferentes = 0;
+    numTotalPal = 0;
+    numDocs = 0;
+}
+
+InfColeccionDocs
+&InfColeccionDocs::operator=(const InfColeccionDocs& aux){
+    if (this == &aux) {
+        return *this;
+    }else{
+        (*this).~InfColeccionDocs();
+
+        tamBytes = aux.tamBytes;
+        numTotalPalSinParada = aux.numTotalPalSinParada;
+        numTotalPalDiferentes = aux.numTotalPalDiferentes;
+        numDocs = aux.numDocs;
+        numTotalPal = aux.numTotalPal;
+
+        return *this;
+    }
+}
 
 ostream& operator<<(ostream& s, const InfColeccionDocs& p){
     s << "numDocs: " << p.numDocs << "\tnumTotalPal: " << p.numTotalPal <<

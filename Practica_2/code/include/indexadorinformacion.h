@@ -25,11 +25,11 @@ public:
     InfTermDoc &operator=(const InfTermDoc &);
 
     //Auxiliares
-    void setFt(int aux){ft = aux;}
-    int getFt(){return ft;}
-
     void setPosTerm(list<int> aux){posTerm = aux;}
     list<int> getPosTerm(){return posTerm;}
+
+    void setFt(int aux){ft = aux;}
+    int getFt(){return ft;}
 
 private:
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
@@ -60,11 +60,11 @@ class InformacionTermino {
         InformacionTermino & operator= (const InformacionTermino &);
 
         //Auxiliares
-        void setFtc(int aux){ftc = aux;}
-        int getFtc(){return ftc;}
-
         void setL_docs(unordered_map<int, InfTermDoc> aux){l_docs = aux;}
         unordered_map<int, InfTermDoc> getL_docs(){return l_docs;}
+
+        void setFtc(int aux){ftc = aux;}
+        int getFtc(){return ftc;}
 
     private:
         // Frecuencia total del término en la colección
@@ -84,28 +84,28 @@ class InfDoc {
 
 public:
     InfDoc (const InfDoc &);
-    InfDoc ();
+    InfDoc (time_t,int, int, int, int, int);
     ~InfDoc ();
     InfDoc & operator= (const InfDoc &);
 
     //Auxiliares
-    void setIdDoc(int aux){idDoc = aux;}
-    int getIdDoc(){return idDoc;}
+    void setFechaModificacion(time_t aux){fechaModificacion = aux;}
+    time_t getFechaModificacion(){return fechaModificacion;}
 
     void setNumPal(int aux){numPal = aux;}
     int getNumPal(){return numPal;}
+
+    void setIdDoc(int aux){idDoc = aux;}
+    int getIdDoc(){return idDoc;}
+
+    void setTamBytes(int aux){tamBytes = aux;}
+    int getTamBytes(){return tamBytes;}
 
     void setNumPalSinParada(int aux){numPalSinParada = aux;}
     int getNumPalSinParada(){return numPalSinParada;}
 
     void setNumPalDiferentes(int aux){numPalDiferentes = aux;}
     int getNumPalDiferentes(){return numPalDiferentes;}
-
-    void setTamBytes(int aux){tamBytes = aux;}
-    int getTamBytes(){return tamBytes;}
-
-    void setFechaModificacion(time_t aux){fechaModificacion = aux;}
-    time_t getFechaModificacion(){return fechaModificacion;}
 
 private:
     // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
@@ -136,7 +136,7 @@ class InfColeccionDocs {
 
 public:
     InfColeccionDocs (const InfColeccionDocs &);
-    InfColeccionDocs ();
+    InfColeccionDocs (int,int,int,int,int);
     ~InfColeccionDocs ();
     InfColeccionDocs & operator= (const InfColeccionDocs &);
 
