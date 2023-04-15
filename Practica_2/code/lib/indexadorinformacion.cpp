@@ -103,8 +103,17 @@ InfDoc::InfDoc(time_t auxFechaModificacion,int auxNumPalDiferentres, int auxTamB
     tamBytes = auxTamBytes;
 }
 
+InfDoc::InfDoc(){
+    fechaModificacion = time(0);
+    numPal = 0;
+    idDoc = 0;
+    numPalSinParada = 0;
+    numPalDiferentes = 0;
+    tamBytes = 0;
+}
+
 InfDoc::~InfDoc(){
-    fechaModificacion = time(0) ;
+    fechaModificacion = 0 ;
     numPal = 0;
     idDoc = 0;
     numPalSinParada = 0;
@@ -157,6 +166,14 @@ InfColeccionDocs::InfColeccionDocs(int auxNumTotalPalDiferentes, int auxTamBytes
     numTotalPalDiferentes = auxNumTotalPalDiferentes;
     numTotalPal = auxNumTotalPal;
     numDocs = auxNumDocs;
+}
+
+InfColeccionDocs::InfColeccionDocs(){
+    tamBytes = 0;
+    numTotalPalSinParada = 0;
+    numTotalPalDiferentes = 0;
+    numTotalPal = 0;
+    numDocs = 0;
 }
 
 InfColeccionDocs::~InfColeccionDocs(){

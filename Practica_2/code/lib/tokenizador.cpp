@@ -320,12 +320,12 @@ Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) {
     f.open(NomFichSal.c_str());
     //Mejor un solo string
     list<string>::iterator itS;
-    cadena = "";
+    //cadena = "";
     for(itS= tokens.begin();itS!= tokens.end();itS++)
     {
-        cadena = (*itS) + "/n";
+        f << (*itS) << "/n";
     }
-    f << cadena;
+    //f << cadena;
     f.close();
     return true;
 }

@@ -409,6 +409,8 @@ private:
     unordered_map<string, int> auxDisco;
 
     void ObtenerInfo();
+
+    void GuardarPalabrasParada();
 };
 
 #endif //PRACTICA_2_INDEXADORHASH_H

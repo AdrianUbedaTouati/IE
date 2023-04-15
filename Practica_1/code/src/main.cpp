@@ -10,16 +10,14 @@ void imprimirListaSTL(const list<string>& cadena)
     cout << endl;
 }
 
-int main() {
-    bool kCasosEspeciales = true, kpasarAminusculas = false;
+int main(void)
+{
+    bool kCasosEspeciales = true, kpasarAminusculas = true;
 
-    list<string> lt1, lt2;
+    list<string> lt1, lt2, lt3;
 
-    Tokenizador a("@.&", true, false);
-    list<string> tokens;
-    a.DelimitadoresPalabra("/ &_:/.?&-=#@");
-    string s = "p0 Http://intime.dlsi.ua.es:8080/dossierct/index.jsp?lang=es&status=probable&date=22-01-2013 p1 p2";
+    Tokenizador a("[]# ", kCasosEspeciales, kpasarAminusculas);
 
-    a.Tokenizar(s, tokens);
-    imprimirListaSTL(tokens);
+    a.Tokenizar("áéíóú ÁÉÍÓÚ àèìòù ÀÈÌÒÙ", lt1);
+    imprimirListaSTL(lt1);
 }

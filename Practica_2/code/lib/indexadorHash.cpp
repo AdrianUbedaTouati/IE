@@ -9,6 +9,8 @@ IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimita
     almacenarPosTerm = almPosTerm;
     ficheroStopWords = fichStopWords;
 
+    ObtenerInfo();
+
     if (dirIndice != "") {
         directorioIndice = dirIndice;
     } else {
@@ -21,8 +23,23 @@ IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimita
         cerr << "Error tStemmer" << endl;
     }
 
-    RecogerInfoColecc();
-    AlmacenarStopWords();
+    fstream i;
+    string line;
+    i.open(ficheroStopWords,ios::in);
+    if (i) {
+        while (!i.eof()) {
+            i >> line;
+            if (line != "" && stopWords.find(line) == stopWords.end()) {
+                stopWords.insert(line);
+            }
+        }
+        i.close();
+    }else{
+        cerr << "ERROR: " << ficheroStopWords << " fichero no encontrado.\n";
+        return;
+    }
+
+
 }
 
 IndexadorHash::IndexadorHash(const string& directorioIndexacion){
@@ -91,14 +108,73 @@ IndexadorHash
         return *this;
     }else{
         (*this).~IndexadorHash();
-        IndexadorHash(indx);
+        informacionColeccionDocs.~InfColeccionDocs();
+        infPregunta.~InformacionPregunta();
+
+        auxDisco.clear();
+        stopWords.clear();
+
+        tok = Tokenizador();
+
+        VaciarIndiceDocs();
+        VaciarIndicePreg();
+
+        ficheroStopWords = "";
+        directorioIndice = "./";
+        tipoStemmer = 0;
+        almacenarEnDisco = false;
+        almacenarPosTerm = false;
         return *this;
     }
 }
 
 bool
 IndexadorHash::Indexar(const string& ficheroDocumentos){
+    fstream infile;
+    list<string> tokens;
 
+    infile.open(ficheroDocumentos, ios::in);
+    if(!infile) {
+        cerr << "ERROR: " << ficheroDocumentos << " fichero no encontrado.\n";
+        return false;
+    }
+
+    while(!infile.eof()) {
+        string doc, line;
+        infile >> doc;
+        if (doc != "") {
+            fstream infile2;
+            infile2.open(doc, ios::in);
+            if(!infile2) {
+                cerr << "ERROR: " << doc << " fichero no encontrado.\n";
+                return false;
+            }
+
+            tokens.clear();
+            while (getline(infile2, line)) {
+                if (line != "") {
+                    tok.Tokenizar(line, tokens);
+                    int id;
+                    // Si el documento ya ha sido indexado
+                    if (indiceDocs.find(doc) != indiceDocs.end()) {
+                        time_t t = indiceDocs.at(doc).getFechaModificacion();
+
+                        // Si la fecha actual es mas reciente que la almacenada
+                        if (time(0) > t) {
+                            id = indiceDocs.at(doc).getIdDoc();
+                            BorraDoc(doc);
+                        }
+                    } else {
+                        id = indiceDocs.size() + 1;
+                    }
+                    IndexarDocumento(doc, id, tokens);
+                    ObtenerInfo();
+                }
+            }
+            infile2.close();
+        }
+    }
+    return false;
 }
 
 bool
@@ -161,14 +237,13 @@ IndexadorHash::BorraDoc(const string& nomDoc){
 
 }
 
-void
-IndexadorHash::VaciarIndiceDocs(){
-
+void IndexadorHash::VaciarIndiceDocs() {
+    indiceDocs.clear();
+    indice.clear();
 }
 
-void
-IndexadorHash::VaciarIndicePreg(){
-
+void IndexadorHash::VaciarIndicePreg() {
+    indicePregunta.clear();
 }
 
 bool
@@ -176,106 +251,142 @@ IndexadorHash::Actualiza(const string& word, const InformacionTermino& inf){
 
 }
 
-bool
-IndexadorHash::Inserta(const string& word, const InformacionTermino& inf){
+bool IndexadorHash::Inserta(const string& word, const InformacionTermino& inf) {
+    return indice.insert(pair<string, InformacionTermino>(word, inf)).second;
+}
 
+int IndexadorHash::NumPalIndexadas() const {
+    return indice.size();
+}
+
+std::string IndexadorHash::DevolverFichPalParada() const {
+    return ficheroStopWords;
+}
+
+void IndexadorHash::ListarPalParada() const {
+    fstream infile;
+    infile.open(ficheroStopWords, ios::in);
+    if (!infile) {
+        cerr << "ERROR: No existe el fichero: " << ficheroStopWords << "\n";
+    }
+
+    while(!infile.eof()){
+        string line;
+        infile >> line;
+        cout << line << '\n';
+    }
+
+    infile.close();
 }
 
 int
-IndexadorHash::NumPalIndexadas() const{
-
+IndexadorHash::NumPalParada() const {
+    return stopWords.size();
 }
 
 string
-IndexadorHash::DevolverFichPalParada () const{
-
+IndexadorHash::DevolverDelimitadores() const {
+    return tok.DelimitadoresPalabra();
 }
 
-void
-IndexadorHash::ListarPalParada() const{
+bool
+IndexadorHash::DevolverCasosEspeciales() const {
+    return tok.CasosEspeciales();
+}
 
+bool
+IndexadorHash::DevolverPasarAminuscSinAcentos() const {
+    return tok.PasarAminuscSinAcentos();
+}
+
+string
+IndexadorHash::DevolverDirIndice() const {
+    return directorioIndice;
 }
 
 int
-IndexadorHash::NumPalParada() const{
-
-}
-
-string
-IndexadorHash::DevolverDelimitadores () const{
-
+IndexadorHash::DevolverTipoStemming() const {
+    return tipoStemmer;
 }
 
 bool
-IndexadorHash::DevolverCasosEspeciales () const{
-
+IndexadorHash::DevolverAlmacenarPosTerm() const {
+    return almacenarPosTerm;
 }
 
 bool
-IndexadorHash::DevolverPasarAminuscSinAcentos () const{
-
-}
-
-bool
-IndexadorHash::DevolverAlmacenarPosTerm () const{
-
-}
-
-string
-IndexadorHash::DevolverDirIndice () const{
-
-}
-
-int
-IndexadorHash::DevolverTipoStemming () const{
-
-}
-
-bool
-IndexadorHash::DevolverAlmEnDisco () const{
-
+IndexadorHash::DevolverAlmEnDisco() const {
+    return almacenarEnDisco;
 }
 
 void
-IndexadorHash::ListarInfColeccDocs() const{
-
+IndexadorHash::ListarInfColeccDocs() const {
+    cout << informacionColeccionDocs << '\n';
 }
 
 void
-IndexadorHash::ListarTerminos() const{
-
+IndexadorHash::ListarTerminos() const {
+    for (const auto& termino : indice){
+        cout << termino.first << '\t' << termino.second << '\n';
+    }
 }
 
 bool
-IndexadorHash::ListarTerminos(const string& nomDoc) const{
-
+IndexadorHash::ListarTerminos(const string& nomDoc) const {
+    try {
+        auto doc = indiceDocs.at(nomDoc);
+        for(const auto& termino : indice){
+            cout << termino.first << '\t'
+                 << termino.second.getL_docs().at(doc.getIdDoc()) << '\n';
+        }
+        return true;
+    } catch (const out_of_range& e){
+        return false;
+    }
 }
 
 void
-IndexadorHash::ListarDocs() const{
-
+IndexadorHash::ListarDocs() const {
+    for(const auto& doc : indiceDocs){
+        cout << doc.first << '\t' << doc.second << '\n';
+    }
 }
 
 bool
-IndexadorHash::ListarDocs(const string& nomDoc) const{
-
+IndexadorHash::ListarDocs(const string &nomDoc) const {
+    try {
+        InfDoc doc = indiceDocs.at(nomDoc);
+        cout << nomDoc << '\t' << doc << '\n';
+        return true;
+    } catch (const out_of_range& e){
+        return false;
+    }
 }
 
 //Auxiliares
 
-void IndexadorHash::ObtenerInfo() {
-    informacionColeccionDocs = InfColeccionDocs();
+void
+IndexadorHash::ObtenerInfo() {
+    int auxNumPal = 0;
+    int auxNumPalSinParada = 0;
+    int auxTamBytes = 0;
 
-    int numPal = 0, numPalSinParada = 0, tamBytes = 0;
     for (const pair <string,InfDoc>& indc : indiceDocs) {
-        numPal += indc.second.getNumPal();
-        numPalSinParada += indc.second.getNumPalSinParada();
-        tamBytes += indc.second.getTamBytes();
+        auxNumPal += indc.second.getNumPal();
+        auxNumPalSinParada += indc.second.getNumPalSinParada();
+        auxTamBytes += indc.second.getTamBytes();
     }
 
+    informacionColeccionDocs = InfColeccionDocs();
+
     informacionColeccionDocs.setNumDocs(indiceDocs.size());
-    informacionColeccionDocs.setNumTotalPal(numPal);
-    informacionColeccionDocs.setNumTotalPalSinParada(numPalSinParada);
+    informacionColeccionDocs.setNumTotalPal(auxNumPal);
+    informacionColeccionDocs.setTamBytes(auxTamBytes);
+    informacionColeccionDocs.setNumTotalPalSinParada(auxNumPalSinParada);
     informacionColeccionDocs.setNumTotalPalDiferentes(indice.size());
-    informacionColeccionDocs.setTamBytes(tamBytes);
+}
+
+void
+IndexadorHash::GuardarPalabrasParada(){
+
 }
