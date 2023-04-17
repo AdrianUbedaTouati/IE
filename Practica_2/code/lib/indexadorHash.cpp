@@ -195,37 +195,37 @@ IndexadorHash::Indexar(const string& ficheroDocumentos){
                                     if (!almacenarEnDisco) {
                                         cerr << "Ultimo documento indexado: " << indiceDocs.end()->first
                                              << " Ultimo termino indexado: " << indice.end()->first << "\n";
-                                        return;
+                                        break;
                                     } else {
-                                        cerr << "Ultimo termino indexado: " << indiceDisco.end()->first << '\n';
+                                        cerr << "Ultimo termino indexado: " << auxDisco.end()->first << '\n';
                                         AlmacenarEnDisco(t, term);
                                     }
                                 }
                             } else {
                                 term = indice.at(t);
-                                term.incFtc();
+                                term.aumentoFtc();
                                 // Si el termino ya se habia encontrado en este documento
                                 if (term.getL_docs().find(id) != term.getL_docs().end()) {
                                     termDoc = term.getL_docs().at(id);
-                                    termDoc.incFt();
+                                    termDoc.AumentoFt();
                                     if (almacenarPosTerm) {
-                                        termDoc.addPosTerm(numPal);
+                                        termDoc.nuevoPosTerm(numPal);
                                     }
                                 } else {
                                     ++numPalDif;
-                                    termDoc.incFt();
+                                    termDoc.AumentoFt();
                                     if (almacenarPosTerm) {
-                                        termDoc.addPosTerm(numPal);
+                                        termDoc.nuevoPosTerm(numPal);
                                     }
-                                    term.addL_docs(id, termDoc);
+                                    term.nuevoL_docs(id, termDoc);
                                 }
                             }
                         }
                         ++numPal;
                     }
                     struct stat buf;
-                    stat(name.c_str(), &buf);
-                    indiceDocs.insert(pair<string, InfDoc> (name, InfDoc(id, numPal, numPalSinPar, numPalDif, (int) *&buf.st_size, time(0))));
+                    stat(doc.c_str(), &buf);
+                    indiceDocs.insert(pair<string, InfDoc> (doc, InfDoc(id, numPal, numPalSinPar, numPalDif, (int) *&buf.st_size, time(0))));
                     //
 
                     ObtenerInfo();

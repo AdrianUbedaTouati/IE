@@ -316,6 +316,7 @@ public:
      * */
     bool ListarDocs(const string& nomDoc) const;
 
+
 private:
     /** Este constructor se pone en la parte privada porque no se permitirá
      * crear un indexador sin inicializarlo convenientemente. La inicialización
@@ -408,9 +409,30 @@ private:
 
     unordered_map<string, int> auxDisco;
 
+    int countFileLines (const string&);
+
+    bool hasEnding (const string&, const string&);
+
     void ObtenerInfo();
 
     void GuardarPalabrasParada();
+
+    void IndexarDocumento(const string& name, const int& id, const list<string> tokens);
+
+    void AlmacenarEnDisco(const string& token, const InformacionTermino&);
+
+    string getTermDisco(int line) const;
+
+    unordered_map<string, InfDoc> getIndiceDocs() const;
+
+    InfColeccionDocs getInfColDocs() const;
+
+    unordered_map<string, InformacionTerminoPregunta> getIndicePreg() const;
+
+    unordered_map<string, InformacionTermino> getIndice() const;
+
+    string getPregunta() const;
+
 };
 
 #endif //PRACTICA_2_INDEXADORHASH_H
