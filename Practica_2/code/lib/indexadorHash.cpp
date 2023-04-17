@@ -1,4 +1,5 @@
 #include "../include/indexadorHash.h"
+#include "../include/stemmer.h"
 
 IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimitadores,const bool& detectComp,
                              const bool& minuscSinAcentos, const string&dirIndice, const int& tStemmer, const bool& almEnDisco,
@@ -167,7 +168,66 @@ IndexadorHash::Indexar(const string& ficheroDocumentos){
                     } else {
                         id = indiceDocs.size() + 1;
                     }
-                    IndexarDocumento(doc, id, tokens);
+                    //
+                    stemmerPorter stem;
+                    int numPalDif = 0, numPalSinPar = 0, numPal = 0;
+
+                    for (const auto& token : tokens) {
+                        string t = token;
+                        stem.stemmer(t, tipoStemmer);
+                        // Si no es palabra de parada
+                        if (stopWords.find(t) == stopWords.end()) {
+                            ++numPalSinPar;
+                            InformacionTermino term;
+                            InfTermDoc termDoc;
+                            if (indice.find(t) == indice.end()) {
+                                ++numPalDif;
+                                term.aumentoFtc();
+                                termDoc.AumentoFt();
+                                if (almacenarPosTerm) {
+                                    termDoc.nuevoPosTerm(numPal);
+                                }
+                                term.nuevoL_docs(id, termDoc);
+                                try {
+                                    indice.insert(pair<string, InformacionTermino>(t, term));
+                                } catch (const bad_alloc &e) {
+                                    cerr << "ERROR: Falta de memoria principal. ";
+                                    if (!almacenarEnDisco) {
+                                        cerr << "Ultimo documento indexado: " << indiceDocs.end()->first
+                                             << " Ultimo termino indexado: " << indice.end()->first << "\n";
+                                        return;
+                                    } else {
+                                        cerr << "Ultimo termino indexado: " << indiceDisco.end()->first << '\n';
+                                        AlmacenarEnDisco(t, term);
+                                    }
+                                }
+                            } else {
+                                term = indice.at(t);
+                                term.incFtc();
+                                // Si el termino ya se habia encontrado en este documento
+                                if (term.getL_docs().find(id) != term.getL_docs().end()) {
+                                    termDoc = term.getL_docs().at(id);
+                                    termDoc.incFt();
+                                    if (almacenarPosTerm) {
+                                        termDoc.addPosTerm(numPal);
+                                    }
+                                } else {
+                                    ++numPalDif;
+                                    termDoc.incFt();
+                                    if (almacenarPosTerm) {
+                                        termDoc.addPosTerm(numPal);
+                                    }
+                                    term.addL_docs(id, termDoc);
+                                }
+                            }
+                        }
+                        ++numPal;
+                    }
+                    struct stat buf;
+                    stat(name.c_str(), &buf);
+                    indiceDocs.insert(pair<string, InfDoc> (name, InfDoc(id, numPal, numPalSinPar, numPalDif, (int) *&buf.st_size, time(0))));
+                    //
+
                     ObtenerInfo();
                 }
             }

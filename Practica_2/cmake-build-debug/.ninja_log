@@ -1,12 +1,9 @@
 # ninja log v5
-1	164	7029896427420277	build.ninja	7a65252ae6057b59
+1	164	7034302996300731	build.ninja	7a65252ae6057b59
 963	1238	7029860290897437	Practica_2.exe	7a87252f363bab77
-4	851	7029860287077335	CMakeFiles/Practica_2.dir/code/src/main.cpp.obj	7f1e1d41ef6a586b
+4	1396	7034275239268936	CMakeFiles/Practica_2.dir/code/src/main.cpp.obj	ec52f4595c2f12b0
 11	462	7029860283179317	CMakeFiles/Practica_2.dir/code/lib/indexadorHash.cpp.obj	a95d698b18c3c01a
-25	929	7029860287856961	CMakeFiles/Practica_2.dir/code/lib/tokenizador.cpp.obj	f182d1d4ea7d1f05
-15	459	7029860283149373	CMakeFiles/Practica_2.dir/code/lib/stemmer.cpp.obj	5a28ab1e86ff65fb
-19	963	7029860288197346	CMakeFiles/Practica_2.dir/code/lib/indexadorinformacion.cpp.obj	2184f46750843b2f
-23	831	7031038645670101	CMakeFiles/Practica_2.dir/C_/Users/andri/CLionProjects/IE/Practica_1/code/lib/tokenizador.cpp.obj	587d5535660c52ed
-5	965	7031038647002348	CMakeFiles/Practica_2.dir/code/src/main.cpp.obj	7f1e1d41ef6a586b
-18	1023	7031038647570848	CMakeFiles/Practica_2.dir/code/lib/indexadorinformacion.cpp.obj	2184f46750843b2f
-8	642	7031039051575191	CMakeFiles/Practica_2.dir/code/lib/tokenizador.cpp.obj	f182d1d4ea7d1f05
+18	1181	7034275237123116	CMakeFiles/Practica_2.dir/code/lib/tokenizador.cpp.obj	a317a882c6636fa0
+13	1052	7034275235829581	CMakeFiles/Practica_2.dir/code/lib/stemmer.cpp.obj	b44e8ad598900757
+29	1500	7034275240297837	CMakeFiles/Practica_2.dir/code/lib/indexadorinformacion.cpp.obj	b53e0611f81bc704
+23	1200	7034275237313694	CMakeFiles/Practica_2.dir/C_/Users/andri/CLionProjects/IE/Practica_1/code/lib/tokenizador.cpp.obj	e350a4730d10919b
