@@ -27,7 +27,7 @@ public:
     //Auxiliares
     void AumentoFt(){ft++;}
 
-    void nuevoPosTerm(const int& pos){posTerm.push_back(pos);posTerm.sort(less<int>());}
+    void nuevaPosicionTermino(const int& pos){posTerm.push_back(pos);posTerm.sort(less<int>());}
 
     //Seters/Geters
     void setPosTerm(list<int> aux){aux.sort(less<int>());posTerm = aux;}
@@ -37,16 +37,16 @@ public:
     int getFt()const{return ft;}
 
 private:
-    // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
+    // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
 
-    // Frecuencia del término en el documento
+    // Frecuencia del tÃ©rmino en el documento
     int ft;
 
-    /** Solo se almacenará esta información si el campo privado del indexador almacenarPosTerm == true
-     * Lista de números de palabra en los que aparece el término en el
-     * documento. Los números de palabra comenzarán desde cero (la primera
-     * palabra del documento). Se numerarán las palabras de parada. Estará
-     * ordenada de menor a mayor posición.
+    /** Solo se almacenarÃ¡ esta informaciÃ³n si el campo privado del indexador almacenarPosTerm == true
+     * Lista de nÃºmeros de palabra en los que aparece el tÃ©rmino en el
+     * documento. Los nÃºmeros de palabra comenzarÃ¡n desde cero (la primera
+     * palabra del documento). Se numerarÃ¡n las palabras de parada. EstarÃ¡
+     * ordenada de menor a mayor posiciÃ³n.
      * */
     list<int> posTerm;
 };
@@ -58,16 +58,16 @@ class InformacionTermino {
         InformacionTermino (const InformacionTermino &);
         // Inicializa ftc = 0
         InformacionTermino ();
-        // Pone ftc = 0 y vacía l_docs
+        // Pone ftc = 0 y vacÃ­a l_docs
         ~InformacionTermino ();
 
-        // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
+        // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
         InformacionTermino & operator= (const InformacionTermino &);
 
         //Auxiliares
         void aumentoFtc(){ftc++;}
 
-        void nuevoL_docs(int &id, InfTermDoc &doc) {
+        void nuevoL_docs(const int &id, InfTermDoc &doc) {
             l_docs.insert(pair<int, InfTermDoc>(id, doc));
         }
 
@@ -79,12 +79,12 @@ class InformacionTermino {
         int getFtc()const{return ftc;}
 
     private:
-        // Frecuencia total del término en la colección
+        // Frecuencia total del tÃ©rmino en la colecciÃ³n
         int ftc;
 
-        /** Tabla Hash que se accederá por el id del documento, devolviendo un
-         * objeto de la clase InfTermDoc que contiene toda la información de
-         * aparición del término en el documento
+        /** Tabla Hash que se accederÃ¡ por el id del documento, devolviendo un
+         * objeto de la clase InfTermDoc que contiene toda la informaciÃ³n de
+         * apariciÃ³n del tÃ©rmino en el documento
          * */
         unordered_map<int, InfTermDoc> l_docs;
 };
@@ -121,25 +121,25 @@ public:
     int getNumPalDiferentes()const{return numPalDiferentes;}
 
 private:
-    // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
+    // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
 
-    // Identificador del documento. El primer documento indexado en la colección será el identificador 1
+    // Identificador del documento. El primer documento indexado en la colecciÃ³n serÃ¡ el identificador 1
     int idDoc;
 
-    // Nº total de palabras del documento
+    // NÂº total de palabras del documento
     int numPal;
 
-    // Nº total de palabras sin stop-words del documento
+    // NÂº total de palabras sin stop-words del documento
     int numPalSinParada;
 
-    // Nº total de palabras diferentes que no sean stop-words (sin acumular la frecuencia de cada una de ellas)
+    // NÂº total de palabras diferentes que no sean stop-words (sin acumular la frecuencia de cada una de ellas)
     int numPalDiferentes;
 
-    // Tamaño en bytes del documento
+    // TamaÃ±o en bytes del documento
     int tamBytes;
 
-    /** Atributo correspondiente a la fecha y hora (completa) de modificación del documento.
-     * El tipo “Fecha/hora” lo elegirá/implementará el alumno
+    /** Atributo correspondiente a la fecha y hora (completa) de modificaciÃ³n del documento.
+     * El tipo âFecha/horaâ lo elegirÃ¡/implementarÃ¡ el alumno
      * */
     time_t fechaModificacion;
 };
@@ -171,23 +171,23 @@ public:
     int getTamBytes()const{return tamBytes;}
 
 private:
-    // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
+    // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
 
-    // Nº total de documentos en la colección
+    // NÂº total de documentos en la colecciÃ³n
     int numDocs;
 
-    // Nº total de palabras en la colección
+    // NÂº total de palabras en la colecciÃ³n
     int numTotalPal;
 
-    // Nº total de palabras sin stop-words en la colección
+    // NÂº total de palabras sin stop-words en la colecciÃ³n
     int numTotalPalSinParada;
 
-    /** Nº total de palabras diferentes en la colección que no sean
+    /** NÂº total de palabras diferentes en la colecciÃ³n que no sean
      * stopwords (sin acumular la frecuencia de cada una de ellas)
      * */
     int numTotalPalDiferentes;
 
-    // Tamaño total en bytes de la colección
+    // TamaÃ±o total en bytes de la colecciÃ³n
     int tamBytes;
 };
 
@@ -203,7 +203,7 @@ public:
     //Auxiliares
     void aumentoFt() {ft++;}
 
-    void nuevoPosTerm(int pos) {posTerm.push_back(pos);}
+    void nuevaPosicionTermino(int pos) {posTerm.push_back(pos);}
 
     //Seters/Geters
     void setFt(int aux){ft = aux;}
@@ -213,16 +213,16 @@ public:
     list<int> getPosTerm()const{return posTerm;}
 
 private:
-    // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
+    // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
 
-    // Frecuencia total del término en la pregunta
+    // Frecuencia total del tÃ©rmino en la pregunta
     int ft;
 
-    /** Solo se almacenará esta información si el campo privado del indexador almacenarPosTerm == true
-     * Lista de números de palabra en los que aparece el término en la pregunta.
-     * Los números de palabra comenzarán desde cero (la primera
-     * palabra de la pregunta). Se numerarán las palabras de parada. Estará
-     * ordenada de menor a mayor posición.
+    /** Solo se almacenarÃ¡ esta informaciÃ³n si el campo privado del indexador almacenarPosTerm == true
+     * Lista de nÃºmeros de palabra en los que aparece el tÃ©rmino en la pregunta.
+     * Los nÃºmeros de palabra comenzarÃ¡n desde cero (la primera
+     * palabra de la pregunta). Se numerarÃ¡n las palabras de parada. EstarÃ¡
+     * ordenada de menor a mayor posiciÃ³n.
      * */
     list<int> posTerm;
 };
@@ -247,15 +247,15 @@ class InformacionPregunta {
     int getNumTotalPalDiferentes()const{return numTotalPalDiferentes;}
 
     private:
-        // Añadir cuantos métodos se consideren necesarios para manejar la parte privada de la clase
+        // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
 
-        // Nº total de palabras en la pregunta
+        // NÂº total de palabras en la pregunta
         int numTotalPal;
 
-        // Nº total de palabras sin stop-words en la pregunta
+        // NÂº total de palabras sin stop-words en la pregunta
         int numTotalPalSinParada;
 
-        /* Nº total de palabras diferentes en la pregunta que no sean stop-words
+        /* NÂº total de palabras diferentes en la pregunta que no sean stop-words
          * (sin acumular la frecuencia de cada una de ellas)
          * */
         int numTotalPalDiferentes;

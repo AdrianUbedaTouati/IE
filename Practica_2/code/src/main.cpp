@@ -1,55 +1,26 @@
-
 #include <iostream>
 #include <string>
 #include <list>
-#include "../include/tokenizador.h"
 #include "../include/indexadorHash.h"
 #include "../include/stemmer.h"
-#include "../include/indexadorinformacion.h"
+
 using namespace std;
-/*
-double getcputime(void) {
-    struct timeval tim;
-    struct rusage ru;
-    getrusage(RUSAGE_SELF, &ru);
-    tim=ru.ru_utime;
-    double t=(double)tim.tv_sec + (double)tim.tv_usec / 1000000.0;
-    tim=ru.ru_stime;
-    t+=(double)tim.tv_sec + (double)tim.tv_usec / 1000000.0;
-    return t;
-}
 
-int main() {
-    long double aa=getcputime();
-    IndexadorHash b("./StopWordsEspanyol.txt", ". ,:", false, false,
-                    "./indicePruebaEspanyol", 0, false, true);
-    b.Indexar("listaFicheros.txt");
-    cout << "Ha tardado " << getcputime() - aa << " segundos" << endl;
-    return 0;
-}
- */
-
-void imprimirListaSTL(const list<string>& cadena)
+int
+main(void)
 {
-    list<string>::const_iterator itCadena;
-    for(itCadena=cadena.begin();itCadena!=cadena.end();itCadena++)
-    {
-        cout << (*itCadena) << ", ";
-    }
-    cout << endl;
-}
+    IndexadorHash a("./StopWordsEspanyol.txt", ". ,:", true, true, "./indicePrueba", 1, false, true);
+    cout << "IndexadorHash a:\n################\n" << a << endl;
 
-int main(void)
-{
-    bool kCasosEspeciales = true, kpasarAminusculas = true;
+    IndexadorHash b("./StopWordsIngles.txt", ". ,:", true, false, "./indicePruebaIngles", 2, true, true);
+    cout << "IndexadorHash b:\n################\n" << b << endl;
 
-    list<string> lt1, lt2, lt3;
-
-    Tokenizador a("[]# ", kCasosEspeciales, kpasarAminusculas);
-
-
-    a.Tokenizar("áéíóú ÁÉÍÓÚ àèìòù ÀÈÌÒÙ", lt1);
-    imprimirListaSTL(lt1);
-
+    cout << b.DevolverDelimitadores () << endl;
+    cout << b.DevolverDirIndice () << endl;
+    cout << b.DevolverTipoStemming () << endl;
+    cout << b.DevolverAlmEnDisco () << endl;
+    cout << b.DevolverAlmacenarPosTerm () << endl;
+    cout << b.DevolverPasarAminuscSinAcentos () << endl;
+    cout << b.DevolverCasosEspeciales () << endl;
 
 }

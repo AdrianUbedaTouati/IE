@@ -331,7 +331,7 @@ Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) {
 }
 
 bool
-Tokenizador::Tokenizar (const string & i) {
+Tokenizador::Tokenizar (string & i) {
     return Tokenizar(i,i+".tk");
 }
 

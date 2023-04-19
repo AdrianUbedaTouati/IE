@@ -1,7 +1,16 @@
 #ifndef PRACTICA_2_INDEXADORHASH_H
 #define PRACTICA_2_INDEXADORHASH_H
 
+
 #include <iostream>
+#include <vector>
+#include <sstream>
+#include <unordered_set>
+#include <fstream>
+#include <iterator>
+#include <algorithm>
+#include <sys/stat.h>
+#include <limits>
 #include <list>
 #include <unordered_set>
 #include "indexadorinformacion.h"
@@ -23,37 +32,38 @@ class IndexadorHash {
 
 public:
     /**
-    * “fichStopWords” será el nombre del archivo que contendrá todas las
-    * palabras de parada (una palabra por cada línea del fichero) y se
-    * almacenará en el campo privado “ficheroStopWords”. Asimismo, almacenará
+    * âfichStopWordsâ serÃ¡ el nombre del archivo que contendrÃ¡ todas las
+    * palabras de parada (una palabra por cada lÃ­nea del fichero) y se
+    * almacenarÃ¡ en el campo privado âficheroStopWordsâ. Asimismo, almacenarÃ¡
     * todas las palabras de parada que contenga el archivo en el campo privado
-    * “stopWords”, el índice de palabras de parada.
+    * âstopWordsâ, el Ã­ndice de palabras de parada.
     *
-    * “delimitadores” será el string que contiene todos los delimitadores utilizados
-    * por el tokenizador (campo privado “tok”)
-    * detectComp y minuscSinAcentos serán los parámetros que se pasarán al tokenizador
-    * “dirIndice” será el directorio del disco duro donde se almacenará el índice
-    * (campo privado “directorioIndice”).
-    * Si dirIndice=”” entonces se almacenará en el directorio donde se ejecute el programa
-    * “tStemmer” inicializará la variable privada “tipoStemmer”:
-    * 0 = no se aplica stemmer: se indexa el término tal y como aparece tokenizado
-    * 1 = stemmer de Porter para español
-    * 2 = stemmer de Porter para inglés
-    * “almEnDisco” inicializará la variable privada “almacenarEnDisco”
-    * “almPosTerm” inicializará la variable privada “almacenarPosTerm”
-    * Los índices (p.ej. índice, indiceDocs e informacionColeccionDocs) quedarán vacíos
+    * âdelimitadoresâ serÃ¡ el string que contiene todos los delimitadores utilizados
+    * por el tokenizador (campo privado âtokâ)
+    * detectComp y minuscSinAcentos serÃ¡n los parÃ¡metros que se pasarÃ¡n al tokenizador
+    * âdirIndiceâ serÃ¡ el directorio del disco duro donde se almacenarÃ¡ el Ã­ndice
+    * (campo privado âdirectorioIndiceâ).
+    * Si dirIndice=ââ entonces se almacenarÃ¡ en el directorio donde se ejecute el programa
+    * âtStemmerâ inicializarÃ¡ la variable privada âtipoStemmerâ:
+    * 0 = no se aplica stemmer: se indexa el tÃ©rmino tal y como aparece tokenizado
+    * 1 = stemmer de Porter para espaÃ±ol
+    * 2 = stemmer de Porter para inglÃ©s
+    * âalmEnDiscoâ inicializarÃ¡ la variable privada âalmacenarEnDiscoâ
+    * âalmPosTermâ inicializarÃ¡ la variable privada âalmacenarPosTermâ
+    * Los Ã­ndices (p.ej. Ã­ndice, indiceDocs e informacionColeccionDocs) quedarÃ¡n vacÃ­os
     * */
     IndexadorHash(const string& fichStopWords, const string& delimitadores,
                   const bool& detectComp, const bool& minuscSinAcentos, const string&
                   dirIndice, const int& tStemmer, const bool& almEnDisco, const bool& almPosTerm);
 
     /**
-     * Constructor para inicializar IndexadorHash a partir de una indexación previamente realizada
-     * que habrá sido almacenada en “directorioIndexacion” mediante el método “bool GuardarIndexacion()”.
-     * Con ello toda la parte privada se inicializará convenientemente, igual
-     * que si se acabase de indexar la colección de documentos. En caso que no
-     * exista el directorio o que no contenga los datos de la indexación se
-     * tratará la excepción correspondiente
+     * Constructor para inicializar IndexadorHash a partir de una indexaciÃ³n previamente realizada
+     * que habrÃ¡ sido almacenada en âdirectorioIndexacionâ mediante el mÃ©todo âbool
+     * GuardarIndexacion()â.
+     * Con ello toda la parte privada se inicializarÃ¡ convenientemente, igual
+     * que si se acabase de indexar la colecciÃ³n de documentos. En caso que no
+     * exista el directorio o que no contenga los datos de la indexaciÃ³n se
+     * tratarÃ¡ la excepciÃ³n correspondiente
      * */
     IndexadorHash(const string& directorioIndexacion);
 
@@ -64,130 +74,131 @@ public:
     IndexadorHash& operator= (const IndexadorHash&);
 
     /**
-     * Devuelve true si consigue crear el índice para la colección de documentos detallada en
-     * ficheroDocumentos,
-     * el cual contendrá un nombre de documento por línea. Los añadirá a los ya existentes
-     * anteriormente en el índice.
-     * Devuelve falso si no finaliza la indexación (p.ej. por falta de memoria),
+     * Devuelve true si consigue crear el Ã­ndice para la colecciÃ³n de documentos detallada en
+     * docCarpeta,
+     * el cual contendrÃ¡ un nombre de documento por lÃ­nea. Los aÃ±adirÃ¡ a los ya existentes
+     * anteriormente en el Ã­ndice.
+     * Devuelve falso si no finaliza la indexaciÃ³n (p.ej. por falta de memoria),
      * mostrando el mensaje de error
-     * correspondiente, indicando el documento y término en el que se ha quedado,
+     * correspondiente, indicando el documento y tÃ©rmino en el que se ha quedado,
      * dejando en memoria lo que se haya indexado hasta ese momento.
      * En el caso que aparezcan documentos repetidos, documentos que no existen
      * o que ya estuviesen previamente
      * indexados (ha de coincidir el nombre del documento y el directorio en que se encuentre),
-     * se devolverá true,
-     * mostrando el mensaje de excepción correspondiente, y se reindexarán
+     * se devolverÃ¡ true,
+     * mostrando el mensaje de excepciÃ³n correspondiente, y se reindexarÃ¡n
      * (borrar el documento previamente indexado e indexar el nuevo)
-     * en caso que la fecha de modificación
-     * del documento sea más reciente que la almacenada previamente
-     * (class “InfDoc” campo “fechaModificacion”).
-     * Los casos de reindexación mantendrán el mismo idDoc.
+     * en caso que la fecha de modificaciÃ³n
+     * del documento sea mÃ¡s reciente que la almacenada previamente
+     * (class âInfDocâ campo âfechaModificacionâ).
+     * Los casos de reindexaciÃ³n mantendrÃ¡n el mismo idDoc.
      * */
-    bool Indexar(const string& ficheroDocumentos);
+    bool Indexar(const string& docCarpeta);
 
     /**
-     * Devuelve true si consigue crear el índice para la colección de documentos
+     * Devuelve true si consigue crear el Ã­ndice para la colecciÃ³n de documentos
      * que se encuentra en el directorio
-     * (y subdirectorios que contenga) dirAIndexar (independientemente de la extensión de los mismos).
-     * Se considerará que todos los documentos del directorio serán ficheros de texto.
-     * Los añadirá a los ya existentes
-     * anteriormente en el índice. Devuelve falso si no finaliza la indexación
-     * (p.ej. por falta de memoria o porque no exista “dirAIndexar”),
+     * (y subdirectorios que contenga) dirAIndexar (independientemente de la extensiÃ³n de los mismos).
+     * Se considerarÃ¡ que todos los documentos del directorio serÃ¡n ficheros de texto.
+     * Los aÃ±adirÃ¡ a los ya existentes
+     * anteriormente en el Ã­ndice. Devuelve falso si no finaliza la indexaciÃ³n
+     * (p.ej. por falta de memoria o porque no exista âdirAIndexarâ),
      * mostrando el mensaje de error correspondiente,
-     * indicando el documento y término en el que se ha quedado,
+     * indicando el documento y tÃ©rmino en el que se ha quedado,
      * dejando en memoria lo que se haya indexado hasta ese momento.
      * En el caso que aparezcan documentos repetidos o que ya estuviesen previamente indexados
      * (ha de coincidir el nombre del documento y el directorio en que se encuentre),
-     * se mostrará el mensaje de
-     * excepción correspondiente,
-     * y se re-indexarán (borrar el documento previamente indexado e indexar el nuevo)
-     * en caso que la fecha de modificación del documento sea más reciente que la
+     * se mostrarÃ¡ el mensaje de
+     * excepciÃ³n correspondiente,
+     * y se re-indexarÃ¡n (borrar el documento previamente indexado e indexar el nuevo)
+     * en caso que la fecha de modificaciÃ³n del documento sea mÃ¡s reciente que la
      * almacenada previamente
-     * (class “InfDoc” campo “fechaModificacion”). Los casos de reindexación mantendrán
+     * (class âInfDocâ campo âfechaModificacionâ). Los casos de reindexaciÃ³n mantendrÃ¡n
      * el mismo idDoc.
      * */
     bool IndexarDirectorio(const string& dirAIndexar);
 
     /**
-    * Se guardará en disco duro (directorio contenido en la variable privada “directorioIndice”)
-    * la indexación actualmente en memoria (incluidos todos los parámetros de la parte privada).
-    * La forma de almacenamiento la determinará el alumno. El objetivo es que esta indexación
+    * Se guardarÃ¡ en disco duro (directorio contenido en la variable privada âdirectorioIndiceâ)
+    * la indexaciÃ³n actualmente en memoria (incluidos todos los parÃ¡metros de la parte privada).
+    * La forma de almacenamiento la determinarÃ¡ el alumno. El objetivo es que esta indexaciÃ³n
     * se pueda recuperar posteriormente mediante el constructor
-    * “IndexadorHash(const string& directorioIndexacion)”.
+    * âIndexadorHash(const string& directorioIndexacion)â.
     * Por ejemplo, supongamos que se ejecuta esta secuencia de comandos:
-    * “IndexadorHash a(“./fichStopWords.txt”, “[ ,.”, “./dirIndexPrueba”, 0, false);
-    * a.Indexar(“./fichConDocsAIndexar.txt”); a.GuardarIndexacion();”,
-    * entonces mediante el comando: “IndexadorHash b(“./dirIndexPrueba”);” se
-    * recuperará la indexación realizada en la secuencia anterior, cargándola en “b”
-    * Devuelve falso si no finaliza la operación (p.ej. por falta de
-    * memoria, o el nombre del directorio contenido en “directorioIndice” no es correcto),
+    * âIndexadorHash a(â./fichStopWords.txtâ, â[ ,.â, â./dirIndexPruebaâ, 0, false);
+    * a.Indexar(â./fichConDocsAIndexar.txtâ); a.GuardarIndexacion();â,
+    * entonces mediante el comando: âIndexadorHash b(â./dirIndexPruebaâ);â se
+    * recuperarÃ¡ la indexaciÃ³n realizada en la secuencia anterior, cargÃ¡ndola en âbâ
+    * Devuelve falso si no finaliza la operaciÃ³n (p.ej. por falta de
+    * memoria, o el nombre del directorio contenido en âdirectorioIndiceâ no es correcto),
     * mostrando el mensaje de error correspondiente, vaciando
     * los ficheros generados.
-    * En caso que no existiese el directorio directorioIndice, habría que crearlo previamente
+    * En caso que no existiese el directorio directorioIndice, habrÃ­a que crearlo previamente
     * */
     bool GuardarIndexacion() const;
 
-    /** Vacía la indexación que tuviese en ese momento e inicializa
-    * IndexadorHash a partir de una indexación previamente realizada que habrá
-    * sido almacenada en “directorioIndexacion” mediante el método “bool
-    * GuardarIndexacion()”. Con ello toda la parte privada se inicializará
-    * convenientemente, igual que si se acabase de indexar la colección de
+    /** VacÃ­a la indexaciÃ³n que tuviese en ese momento e inicializa
+    * IndexadorHash a partir de una indexaciÃ³n previamente realizada que habrÃ¡
+    * sido almacenada en âdirectorioIndexacionâ mediante el mÃ©todo
+     * âbool
+    * GuardarIndexacion()â. Con ello toda la parte privada se inicializarÃ¡
+    * convenientemente, igual que si se acabase de indexar la colecciÃ³n de
     * documentos. En caso que no exista el directorio o que no contenga los
-    * datos de la indexación se tratará la excepción correspondiente, y se
-    * devolverá false, dejando la indexación vacía.
+    * datos de la indexaciÃ³n se tratarÃ¡ la excepciÃ³n correspondiente, y se
+    * devolverÃ¡ false, dejando la indexaciÃ³n vacÃ­a.
     * */
     bool RecuperarIndexacion (const string& directorioIndexacion);
 
     void ImprimirIndexacion() const {
         cout << "Terminos indexados: " << endl;
-        // A continuación aparecerá un listado del contenido del campo privado "índice"
-        // donde para cada término indexado se imprimirá:
+        // A continuaciÃ³n aparecerÃ¡ un listado del contenido del campo privado "Ã­ndice"
+        // donde para cada tÃ©rmino indexado se imprimirÃ¡:
         for(const pair<string,InformacionTermino>& elemento: indice){
             cout << elemento.first << '\t' << elemento.second << endl;
         }
         cout << "Documentos indexados: " << endl;
-        // A continuación aparecerá un listado del contenido del campo privado
-        // “indiceDocs” donde para cada documento indexado se imprimirá:
+        // A continuaciÃ³n aparecerÃ¡ un listado del contenido del campo privado
+        // âindiceDocsâ donde para cada documento indexado se imprimirÃ¡:
         for(const pair<string,InfDoc>& documento: indiceDocs){
             cout << documento.first << '\t' << documento.second << endl;
         }
     }
 
-    /** Devuelve true si consigue crear el índice para la pregunta “preg”.
-    * Antes de realizar la indexación vaciará los campos privados
+    /** Devuelve true si consigue crear el Ã­ndice para la pregunta âpregâ.
+    * Antes de realizar la indexaciÃ³n vaciarÃ¡ los campos privados
     * indicePregunta e infPregunta.
-    * Generará la misma información que en la indexación de documentos, pero dejándola
+    * GenerarÃ¡ la misma informaciÃ³n que en la indexaciÃ³n de documentos, pero dejÃ¡ndola
      * toda accesible en memoria principal
-    * (mediante las variables privadas “pregunta, indicePregunta, infPregunta”)
-    * Devuelve falso si no finaliza la operación (p.ej. por falta de
-    * memoria o bien si la pregunta no contiene ningún término con contenido),
+    * (mediante las variables privadas âpregunta, indicePregunta, infPreguntaâ)
+    * Devuelve falso si no finaliza la operaciÃ³n (p.ej. por falta de
+    * memoria o bien si la pregunta no contiene ningÃºn tÃ©rmino con contenido),
     * mostrando el mensaje de error correspondiente
     * */
     bool IndexarPregunta(const string& preg);
 
-    /** Devuelve true si hay una pregunta indexada (con al menos un término
-    * que no sea palabra de parada, o sea, que haya algún término indexado en
-    * indicePregunta), devolviéndo “pregunta” en “preg”
+    /** Devuelve true si hay una pregunta indexada (con al menos un tÃ©rmino
+    * que no sea palabra de parada, o sea, que haya algÃºn tÃ©rmino indexado en
+    * indicePregunta), devolviÃ©ndo âpreguntaâ en âpregâ
     * */
     bool DevuelvePregunta(string& preg) const;
 
-    /** Devuelve true si word (aplicándole el tratamiento de stemming y
-    * mayúsculas correspondiente) está indexado en la pregunta, devolviendo su
-    * información almacenada “inf”. En caso que no esté, devolvería “inf” vacío
+    /** Devuelve true si word (aplicÃ¡ndole el tratamiento de stemming y
+    * mayÃºsculas correspondiente) estÃ¡ indexado en la pregunta, devolviendo su
+    * informaciÃ³n almacenada âinfâ. En caso que no estÃ©, devolverÃ­a âinfâ vacÃ­o
     * */
-    bool DevuelvePregunta(const string& word, InformacionTerminoPregunta& inf) const;
+    bool DevuelvePregunta(string& word, InformacionTerminoPregunta& inf);
 
     /** Devuelve true si hay una pregunta indexada, devolviendo su
-     * información almacenada (campo privado “infPregunta”) en “inf”. En caso
-     * que no esté, devolvería “inf” vacío
+     * informaciÃ³n almacenada (campo privado âinfPreguntaâ) en âinfâ. En caso
+     * que no estÃ©, devolverÃ­a âinfâ vacÃ­o
      * */
     bool DevuelvePregunta(InformacionPregunta& inf) const;
 
     void ImprimirIndexacionPregunta() {
         cout << "Pregunta indexada: " << pregunta << endl;
         cout << "Terminos indexados en la pregunta: " << endl;
-        /* A continuación aparecerá un listado del contenido de
-         * “indicePregunta” donde para cada término indexado se imprimirá:
+        /* A continuaciÃ³n aparecerÃ¡ un listado del contenido de
+         * âindicePreguntaâ donde para cada tÃ©rmino indexado se imprimirÃ¡:
          * */
         for(const pair<string,InformacionTerminoPregunta>& elemento: indicePregunta){
             cout << elemento.first << '\t' << elemento.second << endl;
@@ -200,71 +211,71 @@ public:
         cout << "Informacion de la pregunta: " << infPregunta << endl;
     }
 
-    /** Devuelve true si word (aplicándole el tratamiento de stemming y
-     * mayúsculas correspondiente) está indexado, devolviendo su información
-     * almacenada “inf”. En caso que no esté, devolvería “inf” vacío
+    /** Devuelve true si word (aplicÃ¡ndole el tratamiento de stemming y
+     * mayÃºsculas correspondiente) estÃ¡ indexado, devolviendo su informaciÃ³n
+     * almacenada âinfâ. En caso que no estÃ©, devolverÃ­a âinfâ vacÃ­o
      * */
-    bool Devuelve(const string& word, InformacionTermino& inf) const;
+    bool Devuelve(string& word, InformacionTermino& inf);
 
-    /** Devuelve true si word (aplicándole el tratamiento de stemming y
-     * mayúsculas correspondiente) está indexado y aparece en el documento de
-     * nombre nomDoc, en cuyo caso devuelve la información almacenada para word
-     * en el documento. En caso que no esté, devolvería “InfDoc” vacío
+    /** Devuelve true si word (aplicÃ¡ndole el tratamiento de stemming y
+     * mayÃºsculas correspondiente) estÃ¡ indexado y aparece en el documento de
+     * nombre nomDoc, en cuyo caso devuelve la informaciÃ³n almacenada para word
+     * en el documento. En caso que no estÃ©, devolverÃ­a âInfDocâ vacÃ­o
      * */
-    bool Devuelve(const string& word, const string& nomDoc, InfTermDoc& InfDoc) const;
+    bool Devuelve(string& word, const string& nomDoc, InfTermDoc& InfDoc);
 
-    /** Devuelve true si word (aplicándole el tratamiento de stemming y
-     * mayúsculas correspondiente) aparece como término indexado
+    /** Devuelve true si word (aplicÃ¡ndole el tratamiento de stemming y
+     * mayÃºsculas correspondiente) aparece como tÃ©rmino indexado
      * */
-    bool Existe(const string& word) const;
+    bool Existe(string& word);
 
-    /** Devuelve true si se realiza el borrado (p.ej. si word, aplicándole el
-     * tratamiento de stemming y mayúsculas correspondiente, aparecía como
-     * término indexado)
+    /** Devuelve true si se realiza el borrado (p.ej. si word, aplicÃ¡ndole el
+     * tratamiento de stemming y mayÃºsculas correspondiente, aparecÃ­a como
+     * tÃ©rmino indexado)
      * */
-    bool Borra(const string& word);
+    bool Borra(string& word);
 
-    /** Devuelve true si nomDoc está indexado y se realiza el borrado de
-     * todos los términos del documento y del documento en los campos privados
-     * “indiceDocs” e “informacionColeccionDocs”
+    /** Devuelve true si nomDoc estÃ¡ indexado y se realiza el borrado de
+     * todos los tÃ©rminos del documento y del documento en los campos privados
+     * âindiceDocsâ e âinformacionColeccionDocsâ
      * */
-    bool BorraDoc(const string& nomDoc);
+    bool BorraDoc(string& nomDoc);
 
-    /** Borra todos los términos del índice de documentos: toda la indexación
+    /** Borra todos los tÃ©rminos del Ã­ndice de documentos: toda la indexaciÃ³n
      * de documentos.
      * */
-    void VaciarIndiceDocs();
+    void RestablecerDocsIndice();
 
-    /** Borra todos los términos del índice de la pregunta: toda la
-     * indexación de la pregunta actual.
+    /** Borra todos los tÃ©rminos del Ã­ndice de la pregunta: toda la
+     * indexaciÃ³n de la pregunta actual.
      * */
-    void VaciarIndicePreg();
+    void RestablecerPregIndice();
 
-    /** Será true si word (aplicándole el tratamiento de stemming y
-     * mayúsculas correspondiente) está indexado, sustituyendo la información almacenada por “inf”
+    /** SerÃ¡ true si word (aplicÃ¡ndole el tratamiento de stemming y
+     * mayÃºsculas correspondiente) estÃ¡ indexado, sustituyendo la informaciÃ³n almacenada por âinfâ
      * */
     bool Actualiza(const string& word, const InformacionTermino& inf);
 
-    /** Será true si se realiza la inserción (p.ej. si word, aplicándole el
-     * tratamiento de stemming y mayúsculas correspondiente, no estaba
+    /** SerÃ¡ true si se realiza la inserciÃ³n (p.ej. si word, aplicÃ¡ndole el
+     * tratamiento de stemming y mayÃºsculas correspondiente, no estaba
      * previamente indexado)
      * */
     bool Inserta(const string& word, const InformacionTermino& inf);
 
-    /** Devolverá el número de términos diferentes indexados (cardinalidad de
-     * campo privado “índice”)
+    /** DevolverÃ¡ el nÃºmero de tÃ©rminos diferentes indexados (cardinalidad de
+     * campo privado âÃ­ndiceâ)
      * */
     int NumPalIndexadas() const;
 
-    // Devuelve el contenido del campo privado “ficheroStopWords”
+    // Devuelve el contenido del campo privado âficheroStopWordsâ
     string DevolverFichPalParada () const;
 
-    /** Mostrará por pantalla las palabras de parada almacenadas (originales, sin aplicar stemming):
-     * una palabra por línea (salto de línea al final de cada palabra)
+    /** MostrarÃ¡ por pantalla las palabras de parada almacenadas (originales, sin aplicar stemming):
+     * una palabra por lÃ­nea (salto de lÃ­nea al final de cada palabra)
      * */
     void ListarPalParada() const;
 
-    // Devolverá el número de palabras de parada almacenadas
+    // DevolverÃ¡ el nÃºmero de palabras de parada almacenadas
     int NumPalParada() const;
 
     // Devuelve los delimitadores utilizados por el tokenizador
@@ -273,139 +284,139 @@ public:
     // Devuelve si el tokenizador analiza los casos especiales
     bool DevolverCasosEspeciales () const;
 
-    // Devuelve si el tokenizador pasa a minúsculas y sin acentos
+    // Devuelve si el tokenizador pasa a minÃºsculas y sin acentos
     bool DevolverPasarAminuscSinAcentos () const;
 
     // Devuelve el valor de almacenarPosTerm
     bool DevolverAlmacenarPosTerm () const;
 
-    // Devuelve “directorioIndice” (el directorio del disco duro donde se almacenará el índice)
+    // Devuelve âdirectorioIndiceâ (el directorio del disco duro donde se almacenarÃ¡ el Ã­ndice)
     string DevolverDirIndice () const;
 
-    /** Devolverá el tipo de stemming realizado en la indexación de acuerdo
-     * con el valor indicado en la variable privada “tipoStemmer”
+    /** DevolverÃ¡ el tipo de stemming realizado en la indexaciÃ³n de acuerdo
+     * con el valor indicado en la variable privada âtipoStemmerâ
      * */
     int DevolverTipoStemming () const;
 
-    // Devolverá el valor indicado en la variable privada “almEnDisco”
+    // DevolverÃ¡ el valor indicado en la variable privada âalmEnDiscoâ
     bool DevolverAlmEnDisco () const;
 
     // Mostrar por pantalla: cout << informacionColeccionDocs << endl;
     void ListarInfColeccDocs() const;
 
     /** Mostrar por pantalla el contenido el contenido del campo privado
-     * “índice”: cout << termino << ‘\t’ << InformacionTermino << endl;
+     * âÃ­ndiceâ: cout << termino << â\tâ << InformacionTermino << endl;
      * */
     void ListarTerminos() const;
 
-    /** Devuelve true si nomDoc existe en la colección y muestra por pantalla todos los términos
-     * indexados del documento con nombre “nomDoc”: cout << termino << ‘\t’ << InformacionTermino
+    /** Devuelve true si nomDoc existe en la colecciÃ³n y muestra por pantalla todos los tÃ©rminos
+     * indexados del documento con nombre ânomDocâ: cout << termino << â\tâ << InformacionTermino
      * << endl; . Si no existe no se muestra nada
      * */
     bool ListarTerminos(const string& nomDoc) const;
 
     /** Mostrar por pantalla el contenido el contenido del campo privado
-     * “indiceDocs”: cout << nomDoc << ‘\t’ << InfDoc << endl;
+     * âindiceDocsâ: cout << nomDoc << â\tâ << InfDoc << endl;
      * */
     void ListarDocs() const;
 
-    /** Devuelve true si nomDoc existe en la colección y muestra por pantalla
-     * el contenido del campo privado “indiceDocs” para el documento con nombre
-     * “nomDoc”: cout << nomDoc << ‘\t’ << InfDoc << endl; . Si no existe no se
+    /** Devuelve true si nomDoc existe en la colecciÃ³n y muestra por pantalla
+     * el contenido del campo privado âindiceDocsâ para el documento con nombre
+     * ânomDocâ: cout << nomDoc << â\tâ << InfDoc << endl; . Si no existe no se
      * muestra nada
      * */
     bool ListarDocs(const string& nomDoc) const;
 
 
 private:
-    /** Este constructor se pone en la parte privada porque no se permitirá
-     * crear un indexador sin inicializarlo convenientemente. La inicialización
-     * la decidirá el alumno
+    /** Este constructor se pone en la parte privada porque no se permitirÃ¡
+     * crear un indexador sin inicializarlo convenientemente. La inicializaciÃ³n
+     * la decidirÃ¡ el alumno
      * */
     IndexadorHash();
 
-    // Índice de términos indexados accesible por el término
+    // Ãndice de tÃ©rminos indexados accesible por el tÃ©rmino
     unordered_map<string, InformacionTermino> indice;
 
-    // Índice de documentos indexados accesible por el nombre del documento
+    // Ãndice de documentos indexados accesible por el nombre del documento
     unordered_map<string, InfDoc> indiceDocs;
 
-    // Información recogida de la colección de documentos indexada
+    // InformaciÃ³n recogida de la colecciÃ³n de documentos indexada
     InfColeccionDocs informacionColeccionDocs;
 
-    // Pregunta indexada actualmente. Si no hay ninguna indexada, contendría el valor “”
+    // Pregunta indexada actualmente. Si no hay ninguna indexada, contendrÃ­a el valor ââ
     string pregunta;
 
-    // Índice de términos indexados en una pregunta. Se almacenará en memoria principal
+    // Ãndice de tÃ©rminos indexados en una pregunta. Se almacenarÃ¡ en memoria principal
     unordered_map<string, InformacionTerminoPregunta> indicePregunta;
 
-    // Información recogida de la pregunta indexada. Se almacenará en memoria principal
+    // InformaciÃ³n recogida de la pregunta indexada. Se almacenarÃ¡ en memoria principal
     InformacionPregunta infPregunta;
 
-    /** Palabras de parada. Se almacenará en memoria principal. El filtrado
-     * de palabras de parada se realizará, tanto en la pregunta como en los
-     * documentos, teniendo en cuenta el parámetro minuscSinAcentos y
-     * tipoStemmer. Es decir que se aplicará el mismo proceso a las palabras de
+    /** Palabras de parada. Se almacenarÃ¡ en memoria principal. El filtrado
+     * de palabras de parada se realizarÃ¡, tanto en la pregunta como en los
+     * documentos, teniendo en cuenta el parÃ¡metro minuscSinAcentos y
+     * tipoStemmer. Es decir que se aplicarÃ¡ el mismo proceso a las palabras de
      * parada almacenadas en el fichero antes de realizar el filtrado (p.ej. si
-     * se aplica el pasar a minúsculas los términos del documento/pregunta a+
-     * indexar, para comprobar si se ha de eliminar el término, éste se
-     * comparará con la versión de palabras de parada en minúsculas). Esto se
-     * pide así para casos en los que en el documento/pregunta aparezca: “La
-     * casa de Él” y estén almacenadas como stopWords “la, el”, si se activa el
-     * parámetro minuscSinAcentos, entonces debería filtrar “La, Él”, si no
-     * hubiese estado activo ese parámetro, entonces no se hubiesen filtrado.
+     * se aplica el pasar a minÃºsculas los tÃ©rminos del documento/pregunta a+
+     * indexar, para comprobar si se ha de eliminar el tÃ©rmino, Ã©ste se
+     * compararÃ¡ con la versiÃ³n de palabras de parada en minÃºsculas). Esto se
+     * pide asÃ­ para casos en los que en el documento/pregunta aparezca: âLa
+     * casa de Ãlâ y estÃ©n almacenadas como stopWords âla, elâ, si se activa el
+     * parÃ¡metro minuscSinAcentos, entonces deberÃ­a filtrar âLa, Ãlâ, si no
+     * hubiese estado activo ese parÃ¡metro, entonces no se hubiesen filtrado.
      * */
     unordered_set<string> stopWords;
 
     // Nombre del fichero que contiene las palabras de parada
     string ficheroStopWords;
 
-    /** Tokenizador que se usará en la indexación. Se inicializará con los parámetros
+    /** Tokenizador que se usarÃ¡ en la indexaciÃ³n. Se inicializarÃ¡ con los parÃ¡metros
      * del constructor: detectComp y minuscSinAcentos, los cuales
-     * determinarán qué término se ha de indexar (p.ej. si se activa
-     * minuscSinAcentos, entonces se guardarán los términos en minúsculas y sin acentos)
+     * determinarÃ¡n quÃ© tÃ©rmino se ha de indexar (p.ej. si se activa
+     * minuscSinAcentos, entonces se guardarÃ¡n los tÃ©rminos en minÃºsculas y sin acentos)
      * */
     Tokenizador tok;
 
-    /** “directorioIndice” será el directorio del disco duro donde se
-     * almacenará el índice. En caso que contenga la cadena vacía se creará en
+    /** âdirectorioIndiceâ serÃ¡ el directorio del disco duro donde se
+     * almacenarÃ¡ el Ã­ndice. En caso que contenga la cadena vacÃ­a se crearÃ¡ en
      * el directorio donde se ejecute el indexador
      * */
     string directorioIndice;
 
-    /** 0 = no se aplica stemmer: se indexa el término tal y como aparece tokenizado
-     * Los siguientes valores harán que los términos a indexar se les aplique el
+    /** 0 = no se aplica stemmer: se indexa el tÃ©rmino tal y como aparece tokenizado
+     * Los siguientes valores harÃ¡n que los tÃ©rminos a indexar se les aplique el
      * stemmer y se almacene solo dicho stem.
-     * 1 = stemmer de Porter para español
-     * 2 = stemmer de Porter para inglés
-     * Para el stemmer de Porter se utilizarán los archivos
-     * stemmer.cpp y stemmer.h, concretamente las funciones de nombre “stemmer”
+     * 1 = stemmer de Porter para espaÃ±ol
+     * 2 = stemmer de Porter para inglÃ©s
+     * Para el stemmer de Porter se utilizarÃ¡n los archivos
+     * stemmer.cpp y stemmer.h, concretamente las funciones de nombre âstemmerâ
      * */
     int tipoStemmer;
 
-    /** Esta opción (cuando almacenarEnDisco == true) está ideada para poder
+    /** Esta opciÃ³n (cuando almacenarEnDisco == true) estÃ¡ ideada para poder
      * indexar colecciones de documentos lo suficientemente grandes para que su
-     * indexación no quepa en memoria, por lo que si es true, mientras se va
-     * generando el índice, se almacenará la mínima parte de los índices de los
-     * documentos en memoria principal, p.ej. solo la estructura “indice” para
-     * saber las palabras indexadas, guardando únicamente punteros a las
-     * posiciones de los archivos almacenados en disco que contendrán el resto
-     * de información asociada a cada término (lo mismo para indiceDocs). Se
-     * valorará el equilibrio para conseguir una indexación independientemente
-     * del tamaño del corpus a indexar, pero reduciendo el número de accesos a
-     * disco. Para los datos de la indexación de la pregunta no habría que
+     * indexaciÃ³n no quepa en memoria, por lo que si es true, mientras se va
+     * generando el Ã­ndice, se almacenarÃ¡ la mÃ­nima parte de los Ã­ndices de los
+     * documentos en memoria principal, p.ej. solo la estructura âindiceâ para
+     * saber las palabras indexadas, guardando Ãºnicamente punteros a las
+     * posiciones de los archivos almacenados en disco que contendrÃ¡n el resto
+     * de informaciÃ³n asociada a cada tÃ©rmino (lo mismo para indiceDocs). Se
+     * valorarÃ¡ el equilibrio para conseguir una indexaciÃ³n independientemente
+     * del tamaÃ±o del corpus a indexar, pero reduciendo el nÃºmero de accesos a
+     * disco. Para los datos de la indexaciÃ³n de la pregunta no habrÃ­a que
      * hacer nada. En caso de que esta variable tenga valor false, se
-     * almacenará todo el índice en memoria principal (tal y como se ha
+     * almacenarÃ¡ todo el Ã­ndice en memoria principal (tal y como se ha
      * descrito anteriormente).
      * */
     bool almacenarEnDisco;
 
-    /** Si es true se almacenará la posición en la que aparecen los términos
+    /** Si es true se almacenarÃ¡ la posiciÃ³n en la que aparecen los tÃ©rminos
      * dentro del documento en la clase InfTermDoc
      * */
     bool almacenarPosTerm;
 
-    //Añadido
+    //AÃ±adido
 
     unordered_map<string, int> auxDisco;
 
@@ -432,6 +443,8 @@ private:
     unordered_map<string, InformacionTermino> getIndice() const;
 
     string getPregunta() const;
+
+    const char *nombreDirectorio = "indiceDisco.txt";
 
 };
 

@@ -82,7 +82,7 @@ public:
      * enviando a cerr el mensaje correspondiente (p.ej. que no exista el
      * archivo i)
      */
-    bool Tokenizar (const string & i) ;
+    bool Tokenizar (string& i) ;
 
     /**
      * Tokeniza el fichero i que contiene un nombre de fichero por línea
