@@ -1,8 +1,6 @@
 #include "../include/indexadorHash.h"
 #include "../include/stemmer.h"
 
-
-
 IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimitadores,const bool& detectComp,
                              const bool& minuscSinAcentos, const string&dirIndice, const int& tStemmer, const bool& almEnDisco,
                              const bool& almPosTerm){
@@ -39,6 +37,7 @@ IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimita
         i.close();
     }else{
         cerr << "Error " << ficheroStopWords << " carpeta no existe.\n";
+        i.close();
     }
 }
 
