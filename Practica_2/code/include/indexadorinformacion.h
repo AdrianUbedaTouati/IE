@@ -37,16 +37,16 @@ public:
     int getFt()const{return ft;}
 
 private:
-    // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
+    // AÃÂ±adir cuantos mÃÂ©todos se consideren necesarios para manejar la parte privada de la clase
 
-    // Frecuencia del tÃ©rmino en el documento
+    // Frecuencia del tÃÂ©rmino en el documento
     int ft;
 
-    /** Solo se almacenarÃ¡ esta informaciÃ³n si el campo privado del indexador almacenarPosTerm == true
-     * Lista de nÃºmeros de palabra en los que aparece el tÃ©rmino en el
-     * documento. Los nÃºmeros de palabra comenzarÃ¡n desde cero (la primera
-     * palabra del documento). Se numerarÃ¡n las palabras de parada. EstarÃ¡
-     * ordenada de menor a mayor posiciÃ³n.
+    /** Solo se almacenarÃÂ¡ esta informaciÃÂ³n si el campo privado del indexador almacenarPosTerm == true
+     * Lista de nÃÂºmeros de palabra en los que aparece el tÃÂ©rmino en el
+     * documento. Los nÃÂºmeros de palabra comenzarÃÂ¡n desde cero (la primera
+     * palabra del documento). Se numerarÃÂ¡n las palabras de parada. EstarÃÂ¡
+     * ordenada de menor a mayor posiciÃÂ³n.
      * */
     list<int> posTerm;
 };
@@ -58,10 +58,10 @@ class InformacionTermino {
         InformacionTermino (const InformacionTermino &);
         // Inicializa ftc = 0
         InformacionTermino ();
-        // Pone ftc = 0 y vacÃ­a l_docs
+        // Pone ftc = 0 y vacÃÂ­a l_docs
         ~InformacionTermino ();
 
-        // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
+        // AÃÂ±adir cuantos mÃÂ©todos se consideren necesarios para manejar la parte privada de la clase
         InformacionTermino & operator= (const InformacionTermino &);
 
         //Auxiliares
@@ -79,12 +79,12 @@ class InformacionTermino {
         int getFtc()const{return ftc;}
 
     private:
-        // Frecuencia total del tÃ©rmino en la colecciÃ³n
+        // Frecuencia total del tÃÂ©rmino en la colecciÃÂ³n
         int ftc;
 
-        /** Tabla Hash que se accederÃ¡ por el id del documento, devolviendo un
-         * objeto de la clase InfTermDoc que contiene toda la informaciÃ³n de
-         * apariciÃ³n del tÃ©rmino en el documento
+        /** Tabla Hash que se accederÃÂ¡ por el id del documento, devolviendo un
+         * objeto de la clase InfTermDoc que contiene toda la informaciÃÂ³n de
+         * apariciÃÂ³n del tÃÂ©rmino en el documento
          * */
         unordered_map<int, InfTermDoc> l_docs;
 };
@@ -121,25 +121,25 @@ public:
     int getNumPalDiferentes()const{return numPalDiferentes;}
 
 private:
-    // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
+    // AÃÂ±adir cuantos mÃÂ©todos se consideren necesarios para manejar la parte privada de la clase
 
-    // Identificador del documento. El primer documento indexado en la colecciÃ³n serÃ¡ el identificador 1
+    // Identificador del documento. El primer documento indexado en la colecciÃÂ³n serÃÂ¡ el identificador 1
     int idDoc;
 
-    // NÂº total de palabras del documento
+    // NÃÂº total de palabras del documento
     int numPal;
 
-    // NÂº total de palabras sin stop-words del documento
+    // NÃÂº total de palabras sin stop-words del documento
     int numPalSinParada;
 
-    // NÂº total de palabras diferentes que no sean stop-words (sin acumular la frecuencia de cada una de ellas)
+    // NÃÂº total de palabras diferentes que no sean stop-words (sin acumular la frecuencia de cada una de ellas)
     int numPalDiferentes;
 
-    // TamaÃ±o en bytes del documento
+    // TamaÃÂ±o en bytes del documento
     int tamBytes;
 
-    /** Atributo correspondiente a la fecha y hora (completa) de modificaciÃ³n del documento.
-     * El tipo âFecha/horaâ lo elegirÃ¡/implementarÃ¡ el alumno
+    /** Atributo correspondiente a la fecha y hora (completa) de modificaciÃÂ³n del documento.
+     * El tipo Ã¢ÂÂFecha/horaÃ¢ÂÂ lo elegirÃÂ¡/implementarÃÂ¡ el alumno
      * */
     time_t fechaModificacion;
 };
@@ -171,23 +171,23 @@ public:
     int getTamBytes()const{return tamBytes;}
 
 private:
-    // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
+    // AÃÂ±adir cuantos mÃÂ©todos se consideren necesarios para manejar la parte privada de la clase
 
-    // NÂº total de documentos en la colecciÃ³n
+    // NÃÂº total de documentos en la colecciÃÂ³n
     int numDocs;
 
-    // NÂº total de palabras en la colecciÃ³n
+    // NÃÂº total de palabras en la colecciÃÂ³n
     int numTotalPal;
 
-    // NÂº total de palabras sin stop-words en la colecciÃ³n
+    // NÃÂº total de palabras sin stop-words en la colecciÃÂ³n
     int numTotalPalSinParada;
 
-    /** NÂº total de palabras diferentes en la colecciÃ³n que no sean
+    /** NÃÂº total de palabras diferentes en la colecciÃÂ³n que no sean
      * stopwords (sin acumular la frecuencia de cada una de ellas)
      * */
     int numTotalPalDiferentes;
 
-    // TamaÃ±o total en bytes de la colecciÃ³n
+    // TamaÃÂ±o total en bytes de la colecciÃÂ³n
     int tamBytes;
 };
 
@@ -213,16 +213,16 @@ public:
     list<int> getPosTerm()const{return posTerm;}
 
 private:
-    // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
+    // AÃÂ±adir cuantos mÃÂ©todos se consideren necesarios para manejar la parte privada de la clase
 
-    // Frecuencia total del tÃ©rmino en la pregunta
+    // Frecuencia total del tÃÂ©rmino en la pregunta
     int ft;
 
-    /** Solo se almacenarÃ¡ esta informaciÃ³n si el campo privado del indexador almacenarPosTerm == true
-     * Lista de nÃºmeros de palabra en los que aparece el tÃ©rmino en la pregunta.
-     * Los nÃºmeros de palabra comenzarÃ¡n desde cero (la primera
-     * palabra de la pregunta). Se numerarÃ¡n las palabras de parada. EstarÃ¡
-     * ordenada de menor a mayor posiciÃ³n.
+    /** Solo se almacenarÃÂ¡ esta informaciÃÂ³n si el campo privado del indexador almacenarPosTerm == true
+     * Lista de nÃÂºmeros de palabra en los que aparece el tÃÂ©rmino en la pregunta.
+     * Los nÃÂºmeros de palabra comenzarÃÂ¡n desde cero (la primera
+     * palabra de la pregunta). Se numerarÃÂ¡n las palabras de parada. EstarÃÂ¡
+     * ordenada de menor a mayor posiciÃÂ³n.
      * */
     list<int> posTerm;
 };
@@ -247,15 +247,15 @@ class InformacionPregunta {
     int getNumTotalPalDiferentes()const{return numTotalPalDiferentes;}
 
     private:
-        // AÃ±adir cuantos mÃ©todos se consideren necesarios para manejar la parte privada de la clase
+        // AÃÂ±adir cuantos mÃÂ©todos se consideren necesarios para manejar la parte privada de la clase
 
-        // NÂº total de palabras en la pregunta
+        // NÃÂº total de palabras en la pregunta
         int numTotalPal;
 
-        // NÂº total de palabras sin stop-words en la pregunta
+        // NÃÂº total de palabras sin stop-words en la pregunta
         int numTotalPalSinParada;
 
-        /* NÂº total de palabras diferentes en la pregunta que no sean stop-words
+        /* NÃÂº total de palabras diferentes en la pregunta que no sean stop-words
          * (sin acumular la frecuencia de cada una de ellas)
          * */
         int numTotalPalDiferentes;

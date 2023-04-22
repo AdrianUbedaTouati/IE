@@ -6,21 +6,25 @@
 
 using namespace std;
 
+
 int
 main(void)
 {
-    IndexadorHash a("./StopWordsEspanyol.txt", ". ,:", true, true, "./indicePrueba", 1, false, true);
-    cout << "IndexadorHash a:\n################\n" << a << endl;
+    IndexadorHash a("./StopWordsEspanyol.txt", ". ,:", false, false, "./indicePrueba", 0, false, true);
 
-    IndexadorHash b("./StopWordsIngles.txt", ". ,:", true, false, "./indicePruebaIngles", 2, true, true);
-    cout << "IndexadorHash b:\n################\n" << b << endl;
+    if(a.Indexar("./listaFicheros_corto.txt"))
+        cout << "Indexacion terminada" << endl;
+    else
+        cout << "Indexacion NO terminada" << endl;
+    cout << a.NumPalIndexadas() << endl;
 
-    cout << b.DevolverDelimitadores () << endl;
-    cout << b.DevolverDirIndice () << endl;
-    cout << b.DevolverTipoStemming () << endl;
-    cout << b.DevolverAlmEnDisco () << endl;
-    cout << b.DevolverAlmacenarPosTerm () << endl;
-    cout << b.DevolverPasarAminuscSinAcentos () << endl;
-    cout << b.DevolverCasosEspeciales () << endl;
+    a.ListarDocs("corpus_corto/fichero1.txt");
+    a.ListarDocs("corpus_corto/fichero2.txt");
+    if(a.ListarDocs("corpus_corto/fichero3.txt"))
+        cout << "Existe el archivo corpus_corto/fichero3.txt" << endl;
+    else
+        cout << "NO Existe el archivo corpus_corto/fichero3.txt" << endl;
+
+    a.ListarInfColeccDocs();
 
 }

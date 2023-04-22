@@ -24,6 +24,7 @@ IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimita
         cerr << "Error tStemmer \n";
     }
 
+
     string linea = "";
     fstream i;
     i.open(ficheroStopWords,ios::in);
@@ -36,9 +37,10 @@ IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimita
         }
         i.close();
     }else{
-        cerr << "Error " << ficheroStopWords << " carpeta no existe.\n";
+        cerr << "Error " << ficheroStopWords << " txt no existe.\n";
         i.close();
     }
+
 }
 
 IndexadorHash::IndexadorHash(const string& directorioIndexacion){
@@ -139,7 +141,7 @@ IndexadorHash
 bool IndexadorHash::Indexar(const string& ficheroDocumentos) {
     fstream infile;
     list<string> tokens;
-
+//carpeta
     infile.open(ficheroDocumentos, ios::in);
     if(!infile) {
         cerr << "ERROR: " << ficheroDocumentos << " fichero no encontrado.\n";
@@ -181,7 +183,7 @@ bool IndexadorHash::Indexar(const string& ficheroDocumentos) {
             infile2.close();
         }
     }
-    return false;
+    return true;
 }
 
 bool IndexadorHash::IndexarDirectorio(const string& dirAIndexar) {
@@ -658,19 +660,22 @@ std::string IndexadorHash::DevolverFichPalParada() const {
 }
 
 void IndexadorHash::ListarPalParada() const {
-    fstream infile;
-    infile.open(ficheroStopWords, ios::in);
-    if (!infile) {
-        cerr << "ERROR: No existe el fichero: " << ficheroStopWords << "\n";
+    string linea = "";
+    fstream i;
+    i.open(ficheroStopWords,ios::in);
+    if (i) {
+        while(!i.eof()){
+            string linea;
+            i >> linea;
+            if(linea != "") {
+                cout << linea << '\n';
+            }
+        }
+        i.close();
+    }else{
+        cerr << "Error " << ficheroStopWords << " txt no existe.\n";
+        i.close();
     }
-
-    while(!infile.eof()){
-        string line;
-        infile >> line;
-        cout << line << '\n';
-    }
-
-    infile.close();
 }
 
 int IndexadorHash::NumPalParada() const {
@@ -765,6 +770,8 @@ void
 IndexadorHash::IndexarDocumento(const string& name, const int& id, const list<string> tokens) {
     stemmerPorter stem;
     int numPalDif = 0, numPalSinPar = 0, numPal = 0;
+    cout << tokens.size() <<" numero de tokens" <<endl;
+
 
     for (const auto& token : tokens) {
         string t = token;
@@ -817,11 +824,14 @@ IndexadorHash::IndexarDocumento(const string& name, const int& id, const list<st
         }
         ++numPal;
     }
+    cout << numPal <<" numero de palabras" <<endl;
     struct stat buf;
     stat(name.c_str(), &buf);
-    indiceDocs.insert(pair<string, InfDoc>
-                              (name, InfDoc(id, numPal, numPalSinPar, numPalDif,
-                                            (int) *&buf.st_size, time(0))));
+
+    indiceDocs.insert(pair<string, InfDoc> (name, InfDoc(time(0),numPalDif, (int) *&buf.st_size, numPalSinPar, id, numPal)));
+
+
+
 }
 
 int IndexadorHash::countFileLines(const string& filename) {

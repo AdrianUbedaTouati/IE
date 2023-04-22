@@ -96,11 +96,11 @@ InfDoc::InfDoc(const InfDoc& aux) {
 
 InfDoc::InfDoc(time_t auxFechaModificacion,int auxNumPalDiferentres, int auxTamBytes, int auxNumPalSinParada,int auxIdDoc ,int auxNumPal){
     fechaModificacion = auxFechaModificacion;
-    numPal = auxNumPal;
-    idDoc = auxIdDoc;
-    numPalSinParada = auxNumPalSinParada;
-    numPalDiferentes = auxNumPalDiferentres;
-    tamBytes = auxTamBytes;
+    this->numPal = auxNumPal;
+    this->idDoc = auxIdDoc;
+    this->numPalSinParada = auxNumPalSinParada;
+    this->numPalDiferentes = auxNumPalDiferentres;
+    this->tamBytes = auxTamBytes;
 }
 
 InfDoc::InfDoc(){
