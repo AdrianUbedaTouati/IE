@@ -163,6 +163,7 @@ bool IndexadorHash::Indexar(const string& ficheroDocumentos) {
             while (getline(infile2, line)) {
                 if (line != "") {
                     tok.Tokenizar(line, tokens);
+
                     int id;
                     // Si el documento ya ha sido indexado
                     if (indiceDocs.find(doc) != indiceDocs.end()) {
@@ -828,8 +829,24 @@ IndexadorHash::IndexarDocumento(const string& name, const int& id, const list<st
     struct stat buf;
     stat(name.c_str(), &buf);
 
-    indiceDocs.insert(pair<string, InfDoc> (name, InfDoc(time(0),numPalDif, (int) *&buf.st_size, numPalSinPar, id, numPal)));
+    if (indiceDocs.find(name) == indiceDocs.end()) {
+        cout << "primer" <<endl;
+        indiceDocs.insert(pair<string, InfDoc> (name, InfDoc(time(0),numPalDif, (int) *&buf.st_size, numPalSinPar, id, numPal)));
+    } else {
+        for ( auto & p : indiceDocs) {
+            if(p.first == name) {
+                cout << numPal << " numero de paralabras antes"<< endl;
+                numPalDif += p.second.getNumPalDiferentes();
+                numPalSinPar += p.second.getNumPalSinParada();
+                numPal += p.second.getNumPal();
+                time_t tiempo = p.second.getFechaModificacion();
+                cout << numPal << " numero de paralabras despues"<< endl;
 
+                indiceDocs.erase(name);
+                indiceDocs.insert(pair<string, InfDoc> (name, InfDoc(tiempo,numPalDif, (int) *&buf.st_size, numPalSinPar, id, numPal)));
+            }
+        }
+    }
 
 
 }
