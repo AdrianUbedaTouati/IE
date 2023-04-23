@@ -167,6 +167,7 @@ bool IndexadorHash::Indexar(const string& ficheroDocumentos) {
                     int id;
                     // Si el documento ya ha sido indexado
                     if (indiceDocs.find(doc) != indiceDocs.end()) {
+
                         time_t t = indiceDocs.at(doc).getFechaModificacion();
 
                         // Si la fecha actual es mas reciente que la almacenada
@@ -174,6 +175,7 @@ bool IndexadorHash::Indexar(const string& ficheroDocumentos) {
                             id = indiceDocs.at(doc).getIdDoc();
                             BorraDoc(doc);
                         }
+
                     } else {
                         id = indiceDocs.size() + 1;
                     }
@@ -771,19 +773,21 @@ void
 IndexadorHash::IndexarDocumento(const string& name, const int& id, const list<string> tokens) {
     stemmerPorter stem;
     int numPalDif = 0, numPalSinPar = 0, numPal = 0;
-    cout << tokens.size() <<" numero de tokens" <<endl;
-
+    //cout << tokens.size() <<" numero de tokens" <<endl;
 
     for (const auto& token : tokens) {
         string t = token;
         stem.stemmer(t, tipoStemmer);
+        cout<<t<< " palabra"<<endl;
         // Si no es palabra de parada
         if (stopWords.find(t) == stopWords.end()) {
+            cout<<t<< " palabra que no es un stopWord"<<endl;
             ++numPalSinPar;
             InformacionTermino term;
             InfTermDoc termDoc;
             if (indice.find(t) == indice.end()) {
                 ++numPalDif;
+                cout<<t<< " palabra diferente "<<numPalDif <<endl;
                 term.aumentoFtc();
                 termDoc.AumentoFt();
                 if (almacenarPosTerm) {
@@ -804,8 +808,9 @@ IndexadorHash::IndexarDocumento(const string& name, const int& id, const list<st
                     }
                 }
             } else {
-                term = indice.at(t);
+                auto &term = indice.at(t);
                 term.aumentoFtc();
+
                 // Si el termino ya se habia encontrado en este documento
                 if (term.getL_docs().find(id) != term.getL_docs().end()) {
                     termDoc = term.getL_docs().at(id);
@@ -825,30 +830,30 @@ IndexadorHash::IndexarDocumento(const string& name, const int& id, const list<st
         }
         ++numPal;
     }
-    cout << numPal <<" numero de palabras" <<endl;
+    //cout << numPal <<" numero de palabras" <<endl;
     struct stat buf;
     stat(name.c_str(), &buf);
 
     if (indiceDocs.find(name) == indiceDocs.end()) {
-        cout << "primer" <<endl;
+        cout << numPalDif << " Creando un nuevo primer objeto resumen con la palabra"<< endl;
         indiceDocs.insert(pair<string, InfDoc> (name, InfDoc(time(0),numPalDif, (int) *&buf.st_size, numPalSinPar, id, numPal)));
     } else {
         for ( auto & p : indiceDocs) {
             if(p.first == name) {
-                cout << numPal << " numero de paralabras antes"<< endl;
+                cout << numPalDif << " numero de paralabras antes"<< endl;
+
                 numPalDif += p.second.getNumPalDiferentes();
                 numPalSinPar += p.second.getNumPalSinParada();
                 numPal += p.second.getNumPal();
                 time_t tiempo = p.second.getFechaModificacion();
-                cout << numPal << " numero de paralabras despues"<< endl;
+
+                cout << numPalDif << " numero de paralabras despues"<< endl;
 
                 indiceDocs.erase(name);
                 indiceDocs.insert(pair<string, InfDoc> (name, InfDoc(tiempo,numPalDif, (int) *&buf.st_size, numPalSinPar, id, numPal)));
             }
         }
     }
-
-
 }
 
 int IndexadorHash::countFileLines(const string& filename) {
