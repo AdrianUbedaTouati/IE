@@ -290,14 +290,19 @@ Tokenizador::PasarAminuscSinAcentosFun(string& str)const{
 }
 
 bool
-Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) {
+Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal)
+{
     ifstream i;
     ofstream f;
     string cadena;
     list<string> tokens;
+
+    remove(NomFichSal.c_str());
     i.open(NomFichEntr.c_str());
-    if(!i) {
-        cerr << "ERROR: No existe el archivo: " << NomFichEntr << endl;
+    f.open(NomFichSal.c_str(), ios::app);
+
+    if(!i.is_open()) {
+        cerr << "ERROR: No existe el archivo: " << NomFichEntr << '\n';
         return false;
     }
     else
@@ -306,30 +311,23 @@ Tokenizador::Tokenizar (const string& NomFichEntr, const string& NomFichSal) {
         {
             cadena="";
             getline(i, cadena);
-            char aux[cadena.length()];
-            for ( int i = 0; i <cadena.length();i++){
-                aux[i]=cadena[i];
-            }
             if(cadena.length()!=0)
             {
-                Tokenizar(aux, tokens);
+                Tokenizar(cadena, tokens);
+
+                list<string>::iterator itS;
+                for(itS= tokens.begin();itS!= tokens.end();itS++)
+                {
+                    f << (*itS) << '\n';
+                }
+
             }
         }
     }
-    i.close();
-    f.open(NomFichSal.c_str());
-    //Mejor un solo string
-    list<string>::iterator itS;
-    //cadena = "";
-    for(itS= tokens.begin();itS!= tokens.end();itS++)
-    {
-        f << (*itS) << "/n";
-    }
-    //f << cadena;
     f.close();
+    i.close();
     return true;
 }
-
 bool
 Tokenizador::Tokenizar (string & i) {
     return Tokenizar(i,i+".tk");

@@ -151,6 +151,9 @@ public:
      */
     bool PasarAminuscSinAcentos () const;
 
+    void PasarAminuscSinAcentosFun(string& str)const;
+
+
 private:
     /**
      * Delimitadores de términos. Aunque se
@@ -192,8 +195,6 @@ private:
 
     void AuxTokenizar (const string& str, list<string>& tokens,string delimitadoresPalabra);
 
-    void PasarAminuscSinAcentosFun(string& str)const;
-
     bool IsDecimal(const string &token)const;
 
     void TratarURL(const string&,string&, size_t&);
@@ -202,11 +203,11 @@ private:
 
     void TratarEmail(const string& ,string&, size_t&);
 
-
     void TratarAcronimo (const string&,string&, size_t&);
 
-
     void TratarMultipalabra(const string&,string&, size_t&);
+
+
 };
 
 #endif /*PRACTICA_1_TOKENIZADOR_H*/

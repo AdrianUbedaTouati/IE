@@ -1,20 +1,23 @@
+#include <vector>
 #include "../include/indexadorHash.h"
 #include "../include/stemmer.h"
 
-IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimitadores,const bool& detectComp,
-                             const bool& minuscSinAcentos, const string&dirIndice, const int& tStemmer, const bool& almEnDisco,
-                             const bool& almPosTerm){
+IndexadorHash::IndexadorHash (const string& fichStopWords, const string& delimitadores,
+                              const bool& detectComp, const bool& minuscSinAcentos, const string& dirIndice,
+                              const int& tStemmer, const bool& almEnDisco, const bool& almPosTerm){
     tok = Tokenizador(delimitadores,detectComp,minuscSinAcentos);
-
     almacenarEnDisco = almEnDisco;
     almacenarPosTerm = almPosTerm;
     ficheroStopWords = fichStopWords;
 
-    ObtenerInfo();
-
     if (dirIndice != "") {
         directorioIndice = dirIndice;
     } else {
+        directorioIndice = "./";
+    }
+
+    if (directorioIndice.empty())
+    {
         directorioIndice = "./";
     }
 
@@ -23,7 +26,6 @@ IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimita
     }else{
         cerr << "Error tStemmer \n";
     }
-
 
     string linea = "";
     fstream i;
@@ -40,15 +42,10 @@ IndexadorHash::IndexadorHash(const string& fichStopWords, const string& delimita
         cerr << "Error " << ficheroStopWords << " txt no existe.\n";
         i.close();
     }
-
 }
 
-IndexadorHash::IndexadorHash(const string& directorioIndexacion){
-    directorioIndice = directorioIndexacion;
-    RecuperarIndexacion(directorioIndexacion);
-}
-
-IndexadorHash::IndexadorHash(const IndexadorHash& indx){
+IndexadorHash::IndexadorHash (const IndexadorHash& indx)
+{
     indice = indx.indice;
     indiceDocs = indx.indiceDocs;
 
@@ -71,17 +68,14 @@ IndexadorHash::IndexadorHash(const IndexadorHash& indx){
     almacenarPosTerm = indx.almacenarPosTerm;
 }
 
-IndexadorHash::IndexadorHash(){
+IndexadorHash::IndexadorHash ()
+{
     informacionColeccionDocs.~InfColeccionDocs();
     infPregunta.~InformacionPregunta();
 
-    auxDisco.clear();
     stopWords.clear();
 
     tok = Tokenizador();
-
-    RestablecerDocsIndice();
-    RestablecerPregIndice();
 
     almacenarEnDisco = false;
     almacenarPosTerm = false;
@@ -90,18 +84,16 @@ IndexadorHash::IndexadorHash(){
     directorioIndice = "./";
 
     tipoStemmer = 0;
-
 }
 
-//*********
-IndexadorHash::~IndexadorHash(){
-    RestablecerDocsIndice();
-    RestablecerPregIndice();
+IndexadorHash::~IndexadorHash ()
+{
+    informacionColeccionDocs.~InfColeccionDocs();
+    infPregunta.~InformacionPregunta();
 
     almacenarPosTerm = false;
     almacenarEnDisco = false;
 
-    auxDisco.clear();
     stopWords.clear();
 
     ficheroStopWords ="";
@@ -111,1179 +103,1065 @@ IndexadorHash::~IndexadorHash(){
     tipoStemmer = 0;
 }
 
-IndexadorHash
-&IndexadorHash::operator= (const IndexadorHash& indx){
+IndexadorHash&
+IndexadorHash::operator= (const IndexadorHash& indx)
+{
     if (this == &indx) {
         return *this;
     }else{
-        (*this).~IndexadorHash();
-        informacionColeccionDocs.~InfColeccionDocs();
-        infPregunta.~InformacionPregunta();
+        this->~IndexadorHash();
+        indice = indx.indice;
+        indiceDocs = indx.indiceDocs;
 
-        auxDisco.clear();
-        stopWords.clear();
+        informacionColeccionDocs = indx.informacionColeccionDocs;
 
-        tok = Tokenizador();
+        pregunta = indx.pregunta;
+        indicePregunta = indx.indicePregunta;
+        infPregunta = indx.infPregunta;
 
-        RestablecerDocsIndice();
-        RestablecerPregIndice();
+        stopWords = indx.stopWords;
+        ficheroStopWords = indx.ficheroStopWords;
 
-        ficheroStopWords = "";
-        directorioIndice = "./";
-        tipoStemmer = 0;
-        almacenarEnDisco = false;
-        almacenarPosTerm = false;
+        tok = Tokenizador(indx.tok);
+
+        directorioIndice = indx.directorioIndice;
+
+        tipoStemmer = indx.tipoStemmer;
+
+        almacenarEnDisco = indx.almacenarEnDisco;
+        almacenarPosTerm = indx.almacenarPosTerm;
         return *this;
     }
 }
 
-
-bool IndexadorHash::Indexar(const string& ficheroDocumentos) {
-    fstream infile;
-    list<string> tokens;
-//carpeta
-    infile.open(ficheroDocumentos, ios::in);
-    if(!infile) {
-        cerr << "ERROR: " << ficheroDocumentos << " fichero no encontrado.\n";
-        return false;
-    }
-
-    while(!infile.eof()) {
-        string doc, line;
-        infile >> doc;
-        if (doc != "") {
-            fstream infile2;
-            infile2.open(doc, ios::in);
-            if(!infile2) {
-                cerr << "ERROR: " << doc << " fichero no encontrado.\n";
-                return false;
-            }
-
-            tokens.clear();
-            while (getline(infile2, line)) {
-                if (line != "") {
-                    tok.Tokenizar(line, tokens);
-
-                    int id;
-                    // Si el documento ya ha sido indexado
-                    if (indiceDocs.find(doc) != indiceDocs.end()) {
-
-                        time_t t = indiceDocs.at(doc).getFechaModificacion();
-
-                        // Si la fecha actual es mas reciente que la almacenada
-                        if (time(0) > t) {
-                            id = indiceDocs.at(doc).getIdDoc();
-                            BorraDoc(doc);
-                        }
-
-                    } else {
-                        id = indiceDocs.size() + 1;
-                    }
-                    IndexarDocumento(doc, id, tokens);
-                    ObtenerInfo();
-                }
-            }
-            infile2.close();
-        }
-    }
-    return true;
-}
-
-bool IndexadorHash::IndexarDirectorio(const string& dirAIndexar) {
-    struct stat dir;
-    int err = stat(dirAIndexar.c_str(), &dir);
-    if (err == -1 || !S_ISDIR(dir.st_mode)) {
-        return false;
-    } else {
-        string cmd = "find " + dirAIndexar + "/ -follow | sort | awk '!/\\/$/{print}' > .lista_fich";
-        system(cmd.c_str());
-        return Indexar(".lista_fich");
-    }
-}
-
-bool IndexadorHash::GuardarIndexacion() const {
-    fstream outfile;
-    outfile.open(directorioIndice, ios::out);
-    outfile << "indexadorHash{\n"
-            << "\tstemmer: " << tipoStemmer << "\n"
-            << "\talmacenarEnDisco: " << boolalpha << almacenarEnDisco << "\n"
-            << "\talmacenarPosTerm: " << boolalpha << almacenarPosTerm << "\n"
-            << "\tpregunta: " << pregunta << "#FINP#\n"
-            << "\tficheroStopWords: " << ficheroStopWords << "\n"
-
-            << "\ttokenizador{\n"
-            << "\t\tpasarAminuscSinAcentos: " << boolalpha << tok.PasarAminuscSinAcentos() << "\n"
-            << "\t\tcasosEspeciales: " << boolalpha << tok.CasosEspeciales() << "\n"
-            << "\t\tdelimitadoresPalabra: " << tok.DelimitadoresPalabra() << "#FIND#\n\t}\n"
-
-            << "\tInfColeccionDocs{\n"
-            << "\t\tnumDocs: " << informacionColeccionDocs.getNumDocs() << "\n"
-            << "\t\tnumTotalPal: " << informacionColeccionDocs.getNumTotalPal() << "\n"
-            << "\t\tnumTotalPalSinParada: " << informacionColeccionDocs.getNumTotalPalSinParada() << "\n"
-            << "\t\tnumTotalPalDiferentes: " << informacionColeccionDocs.getNumTotalPalDiferentes() << "\n"
-            << "\t\ttamBytes: " << informacionColeccionDocs.getTamBytes() << "\n\t}\n"
-
-            << "\tInfDoc{ doc idDoc numPal numPalSinParada numPalDiferentes tamBytes fechaMod\n";
-    for (const auto& doc : indiceDocs) {
-        outfile << "\t\t" << doc.first
-                << " " << doc.second.getIdDoc()
-                << " " << doc.second.getNumPal()
-                << " " << doc.second.getNumPalSinParada()
-                << " " << doc.second.getNumPalDiferentes()
-                << " " << doc.second.getTamBytes()
-                << " " << doc.second.getFechaModificacion() << "\n";
-    }
-    outfile << "\t}\n"
-
-            << "\tInfPregunta{\n"
-            << "\t\tnumTotalPal: " << infPregunta.getNumTotalPal() << "\n"
-            << "\t\tnumTotalPalSinParada: " << infPregunta.getNumTotalPalSinParada() << "\n"
-            << "\t\tnumTotalPalDiferentes: " << infPregunta.getNumTotalPalDiferentes() << "\n"
-            << "\t{\n"
-
-            << "\tInormacionTermino{\n";
-    for (const auto& term : indice) {
-        outfile << "\t\t" << term.first
-                << "," << term.second.getFtc() << ",";
-        for (const auto& doc : term.second.getL_docs()) {
-            outfile << doc.first << "/"
-                    << doc.second.getFt() << "/";
-            for (int pos : doc.second.getPosTerm()) {
-                outfile << pos << "|";
-            }
-            outfile << " ";
-        }
-        outfile << "\n";
-    }
-    outfile << "\t}\n"
-            << "\tInformacionTerminoPregunta(term,ft,posTerm posTerm ...){\n";
-    for (const auto& term : indicePregunta) {
-        outfile << "\t\t" << term.first
-                << "," << term.second.getFt() << ",";
-        for (const auto& pos : term.second.getPosTerm()) {
-            outfile << pos << " ";
-        }
-        outfile << "\n";
-    }
-    outfile << "\t}\n}";
-
-    bool ret = outfile.good();
-    outfile.close();
-    return ret;
-}
-
-bool IndexadorHash::hasEnding(const string& str, const string& ending) {
-    if (str.length() >= ending.length()) {
-        return (0 == str.compare (str.length() - ending.length(), ending.length(), ending));
-    } else {
-        return false;
-    }
-}
-
-bool IndexadorHash::RecuperarIndexacion(const string& directorioIndexacion) {
-    fstream infile;
-    infile.open(directorioIndexacion, ios::in);
-    if (!infile) {
-        return false;
-    }
-    string line, section;
-    string delimitadoresPalabra;
-    bool pasarAminuscSinAcentos = true, casosEspeciales = true;
-    while (getline(infile, line)) {
-        if (line.rfind("\tstemmer:", 0) == 0) {
-            tipoStemmer = (int)line.at(10) - '0';
-        } else if (line.rfind("\talmacenarEnDisco:", 0) == 0) {
-            istringstream(line.substr(19)) >> boolalpha >> almacenarEnDisco;
-        } else if (line.rfind("\talmacenarPosTerm:", 0) == 0) {
-            istringstream(line.substr(19)) >> boolalpha >> almacenarEnDisco;
-        } else if (line.rfind("\tpregunta:", 0) == 0) {
-            string aux = line.substr(11);
-            // remove "#FINP#\n"
-            if (hasEnding(line, "#FINP#\n")) {
-                aux.resize(aux.size() - 7);
-            }
-            pregunta = aux;
-        } else if (hasEnding(line, "#FINP#\n") && line.size() > 7) {
-            // remove "#FINP#\n"
-            if (hasEnding(line, "#FINP#\n")) {
-                line.resize(line.size() - 7);
-            }
-            pregunta += line;
-        } else if (line.rfind("\tficheroStopWords:", 0) == 0) {
-            string aux = line.substr(19);
-            // remove last char '\n'
-            aux.pop_back();
-            pregunta = aux;
-        } // if section
-        else if (line.at(0) == '\t' && line.at(1) != '\t') {
-            section = line.substr(1);
-        } else if (section.rfind("tokenizador{", 0) == 0) {
-            if (line.rfind("\t\tpasarAminuscSinAcentos:", 0) == 0 && line.size() > 27) {
-                bool b;
-                istringstream(line.substr(26)) >> boolalpha >> b;
-                pasarAminuscSinAcentos = b;
-            } else if (line.rfind("\t\tcasosEspeciales:", 0) == 0 && line.size() > 20) {
-                bool b;
-                istringstream(line.substr(19)) >> boolalpha >> b;
-                casosEspeciales = b;
-            } else if (line.rfind("\t\tdelimitadoresPalabra:", 0) == 0) {
-                string aux = line.substr(24);
-                // remove "#FIND#\n"
-                if (hasEnding(line, "#FIND#\n")) {
-                    aux.resize(aux.size() - 7);
-                }
-                delimitadoresPalabra = aux;
-            } else if (hasEnding(line, "#FIND#\n") && line.size() > 7) {
-                // remove "#FIND#\n"
-                if (hasEnding(line, "#FIND#\n")) {
-                    line.resize(line.size() - 7);
-                }
-                delimitadoresPalabra += line;
-            }
-        } else if (section.rfind("InfColeccionDocs{", 0) == 0) {
-            if (line.rfind("\t\tnumDocs:", 0) == 0) {
-                informacionColeccionDocs.setNumDocs(stoi(line.substr(11)));
-            } else if (line.rfind("\t\tnumTotalPal:", 0) == 0) {
-                informacionColeccionDocs.setNumTotalPal(stoi(line.substr(15)));
-            } else if (line.rfind("\t\tnumTotalPalSinParada:", 0) == 0) {
-                informacionColeccionDocs.setNumTotalPalSinParada(stoi(line.substr(24)));
-            } else if (line.rfind("\t\tnumTotalPalDiferentes:", 0) == 0) {
-                informacionColeccionDocs.setNumTotalPalDiferentes(stoi(line.substr(25)));
-            } else if (line.rfind("\t\ttamBytes:", 0) == 0) {
-                informacionColeccionDocs.setTamBytes(stoi(line.substr(12)));
-            }
-        } else if (section.rfind("InfDoc{", 0) == 0) {
-            // remove "\t\t" from the beginning
-            line.erase(0,2);
-
-            stringstream ss(line);
-            string token;
-            vector<string> tokens;
-            while (ss >> token) {
-                tokens.push_back(token);
-            }
-            InfDoc doc;
-            doc.setIdDoc(stoi(tokens[1]));
-            doc.setNumPal(stoi(tokens[2]));
-            doc.setNumPalSinParada(stoi(tokens[3]));
-            doc.setNumPalDiferentes(stoi(tokens[4]));
-            doc.setTamBytes(stoi(tokens[5]));
-            doc.setFechaModificacion(stoi(tokens[6]));
-            indiceDocs[tokens[0]] = doc;
-        } else if (section.rfind("InfPregunta{", 0) == 0) {
-            if (line.rfind("\t\tnumTotalPal:", 0) == 0) {
-                infPregunta.setNumTotalPal(stoi(line.substr(15)));
-            } else if (line.rfind("\t\tnumTotalPalSinParada:", 0) == 0) {
-                infPregunta.setNumTotalPalSinParada(stoi(line.substr(24)));
-            } else if (line.rfind("\t\tnumTotalPalDiferentes:", 0) == 0) {
-                infPregunta.setNumTotalPalDiferentes(stoi(line.substr(25)));
-            }
-        } else if (section.rfind("InformacionTermino{", 0) == 0) {
-            // remove "\t\t" from the beginning
-            line.erase(0,2);
-
-            stringstream ss(line);
-            string token;
-            vector<string> tokens;
-            while (getline(ss, token, ',')) {
-                tokens.push_back(token);
-            }
-            InformacionTermino termino;
-            termino.setFtc(stoi(tokens[1]));
-            // store l_docs
-            for (int i = 2; i < tokens.size(); ++i) {
-                InfTermDoc infTermDoc;
-                stringstream ss1(tokens[i]);
-                string tDoc;
-                vector<string> tDocs;
-                while (getline(ss1, tDoc, '/')) {
-                    tDocs.push_back(tDoc);
-                }
-                infTermDoc.setFt(stoi(tDocs[1]));
-                // store
-                if (almacenarPosTerm) {
-                    stringstream ss2(tDocs[2]);
-                    string pos;
-                    while (getline(ss2, pos, '|')) {
-                        infTermDoc.nuevaPosicionTermino(stoi(pos));
-                    }
-                }
-                termino.nuevoL_docs(stoi(tDocs[0]), infTermDoc);
-            }
-            indice[tokens[0]] = termino;
-        } else if (section.rfind("InformacionTerminoPregunta{", 0) == 0) {
-            // remove "\t\t" from the beginning
-            line.erase(0,2);
-
-            stringstream ss(line);
-            string token;
-            vector<string> tokens;
-            while (getline(ss, token, ',')) {
-                tokens.push_back(token);
-            }
-            InformacionTerminoPregunta infTP;
-            infTP.setFt(stoi(tokens[1]));
-            stringstream ss1(tokens[2]);
-            string pos;
-            while (getline(ss1, pos, ' ')) {
-                infTP.nuevaPosicionTermino(stoi(pos));
-            }
-            indicePregunta[tokens[0]] = infTP;
-        }
-    }
-    tok = Tokenizador(delimitadoresPalabra, casosEspeciales, pasarAminuscSinAcentos);
-    infile.close();
-    return true;
-}
-
-bool IndexadorHash::IndexarPregunta(const string& preg) {
-    pregunta = preg;
-    list<string> tokens;
-    RestablecerPregIndice();
-
-
-    infPregunta = InformacionPregunta();
-    stemmerPorter stem;
-    int numPalSinPar = 0, numPal = 0;
-
-    tok.Tokenizar(pregunta, tokens);
-    for (const auto& token : tokens) {
-        string t = token;
-        stem.stemmer(t, tipoStemmer);
-        // Si no es palabra de parada
-        if (stopWords.find(token) == stopWords.end()) {
-            ++numPalSinPar;
-            InformacionTerminoPregunta termPreg;
-            if (indicePregunta.find(token) != indicePregunta.end()) {
-                termPreg = indicePregunta.at(token);
-            } else {
-                indicePregunta.insert(pair<string, InformacionTerminoPregunta>(token, termPreg));
-            }
-            termPreg.aumentoFt();
-            if (almacenarPosTerm) {
-                termPreg.nuevaPosicionTermino(numPal);
-            }
-            indicePregunta.at(token) = termPreg;
-        }
-        ++numPal;
-    }
-    infPregunta.setNumTotalPal(numPal);
-    infPregunta.setNumTotalPalSinParada(numPalSinPar);
-    infPregunta.setNumTotalPalDiferentes(indicePregunta.size());
-    return true;
-}
-
-bool IndexadorHash::DevuelvePregunta(string& preg) const {
-    if (pregunta != "" && !indicePregunta.empty()) {
-        preg = pregunta;
-        return true;
-    }
-    return false;
-}
-
-bool IndexadorHash::DevuelvePregunta(string& word, InformacionTerminoPregunta& inf) {
-    stemmerPorter stem;
-    string w = word;
-    tok.Tokenizar(word);
-    stem.stemmer(w, tipoStemmer);
-
-    if (pregunta != "") {
-        unordered_map<string, InformacionTerminoPregunta>::const_iterator i = indicePregunta.find(w);
-        if (i != indicePregunta.end()) {
-            inf= i->second;
-            return true;
-        }
-    }
-    inf.~InformacionTerminoPregunta();
-    return false;
-}
-
-bool IndexadorHash::DevuelvePregunta(InformacionPregunta& inf) const {
-    if (pregunta != "") {
-        inf = infPregunta;
-        return true;
-    }
-    inf.~InformacionPregunta();
-    return false;
-}
-
-bool IndexadorHash::Devuelve(string& word, InformacionTermino& inf) {
-    stemmerPorter stem;
-    string w = word;
-    tok.Tokenizar(word);
-    stem.stemmer(w, tipoStemmer);
-
-    unordered_map<string, InformacionTermino>::const_iterator i = indice.find(w);
-    if (i != indice.end()) {
-        inf = i->second;
-        return true;
-    } else if (almacenarEnDisco) {
-        unordered_map<string, int>::const_iterator ind = auxDisco.find(w);
-        if (ind != auxDisco.end()) {
-            string str = getTermDisco(auxDisco.at(w));
-            //inf =
-            return true;
-        }
-    }
-    inf.~InformacionTermino();
-    return false;
-}
-
-bool IndexadorHash::Devuelve(string& word, const string& nomDoc, InfTermDoc& infDoc) {
-    stemmerPorter stem;
-    string w = word;
-    tok.Tokenizar(word);
-    stem.stemmer(w, tipoStemmer);
-
-    try {
-        InformacionTermino inf = indice.at(w);
-        infDoc = inf.getL_docs().at(indiceDocs.at(nomDoc).getIdDoc());
-        return true;
-    } catch (const out_of_range& e){
-        return false;
-    }
-}
-
-bool IndexadorHash::Existe(string& word) {
-    stemmerPorter stem;
-    string w = word;
-    tok.Tokenizar(w);
-    stem.stemmer(w, tipoStemmer);
-
-    unordered_map<string, InformacionTermino>::const_iterator i = indice.find(w);
-    if (i != indice.end()) {
-        return true;
-    } else if (almacenarEnDisco) {
-        unordered_map<string, int>::const_iterator ind = auxDisco.find(w);
-        if (ind != auxDisco.end()) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool IndexadorHash::Borra(string& word) {
-    stemmerPorter stem;
-    string w = word;
-    tok.Tokenizar(word);
-    stem.stemmer(w, tipoStemmer);
-
-    unordered_map<string, InformacionTermino>::const_iterator i = indice.find(w);
-    if(i != indice.end()) {
-        indice.erase(w);
-        return true;
-    } else if (almacenarEnDisco) {
-        unordered_map<string, int>::const_iterator ind = auxDisco.find(w);
-        if(ind != auxDisco.end()) {
-            int numLine = ind->second;
-            fstream infile;
-            infile.open(nombreDirectorio, ios::in);
-            if(!infile) {
-                cerr << "ERROR: " << nombreDirectorio << " fichero no encontrado.\n";
-                return false;
-            }
-            int count = 0;
-            fstream tempfile;
-            tempfile.open("tempfile.txt", ios::out);
-            while(!infile.eof()) {
-                if (count != numLine) {
-                    string line;
-                    infile >> line;
-                    tempfile << line << '\n';
-                }
-                ++count;
-            }
-            infile.close();
-            tempfile.close();
-            // delete the original file
-            remove(nombreDirectorio);
-            // rename old to new
-            rename("tempfile.txt",nombreDirectorio);
-            auxDisco.erase(w);
-            return true;
-        }
-    }
-    return false;
-}
-
-bool IndexadorHash::BorraDoc(string& nomDoc) {
-    try {
-        InfDoc doc = indiceDocs.at(nomDoc);
-        int id = doc.getIdDoc();
-        unordered_set<string> idDocBorr;
-        for (auto &elem : indice) {
-            const auto& docs = elem.second.getL_docs();
-            if (docs.find(id) != docs.end()) {
-                elem.second.setFtc(elem.second.getFtc() - docs.at(id).getFt());
-                const_cast<unordered_map<int, InfTermDoc>&>(docs).erase(id);
-            }
-            if(elem.second.getFtc() == 0) {
-                idDocBorr.insert(elem.first);
-            }
-        }
-        for (const auto &i : idDocBorr) {
-            indice.erase(i);
-        }
-        indiceDocs.erase(nomDoc);
-        ObtenerInfo();
-    } catch (const out_of_range& e) {
-        return false;
-    }
-    return true;
-}
-
-void IndexadorHash::RestablecerDocsIndice() {
-    indiceDocs.clear();
-    indice.clear();
-}
-
-void IndexadorHash::RestablecerPregIndice() {
-    indicePregunta.clear();
-}
-
-bool IndexadorHash::Actualiza(const string& word, const InformacionTermino& inf) {
-    try {
-        indice.at(word) = inf;
-        return true;
-    } catch (const out_of_range& e) {
-        return false;
-    }
-}
-
-bool IndexadorHash::Inserta(const string& word, const InformacionTermino& inf) {
-    return indice.insert(pair<string, InformacionTermino>(word, inf)).second;
-}
-
-int IndexadorHash::NumPalIndexadas() const {
-    return indice.size();
-}
-
-std::string IndexadorHash::DevolverFichPalParada() const {
-    return ficheroStopWords;
-}
-
-void IndexadorHash::ListarPalParada() const {
-    string linea = "";
-    fstream i;
-    i.open(ficheroStopWords,ios::in);
-    if (i) {
-        while(!i.eof()){
-            string linea;
-            i >> linea;
-            if(linea != "") {
-                cout << linea << '\n';
-            }
-        }
-        i.close();
-    }else{
-        cerr << "Error " << ficheroStopWords << " txt no existe.\n";
-        i.close();
-    }
-}
-
-int IndexadorHash::NumPalParada() const {
-    return stopWords.size();
-}
-
-std::string IndexadorHash::DevolverDelimitadores() const {
-    return tok.DelimitadoresPalabra();
-}
-
-bool IndexadorHash::DevolverCasosEspeciales() const {
-    return tok.CasosEspeciales();
-}
-
-bool IndexadorHash::DevolverPasarAminuscSinAcentos() const {
-    return tok.PasarAminuscSinAcentos();
-}
-
-std::string IndexadorHash::DevolverDirIndice() const {
-    return directorioIndice;
-}
-
-int IndexadorHash::DevolverTipoStemming() const {
-    return tipoStemmer;
-}
-
-bool IndexadorHash::DevolverAlmacenarPosTerm() const {
-    return almacenarPosTerm;
-}
-
-bool IndexadorHash::DevolverAlmEnDisco() const {
-    return almacenarEnDisco;
-}
-
-void IndexadorHash::ListarInfColeccDocs() const {
-    cout << informacionColeccionDocs << '\n';
-}
-
-void IndexadorHash::ListarTerminos() const {
-    for (const auto& termino : indice){
-        cout << termino.first << '\t' << termino.second << '\n';
-    }
-}
-
-bool IndexadorHash::ListarTerminos(const string& nomDoc) const {
-    try {
-        auto doc = indiceDocs.at(nomDoc);
-        for(const auto& termino : indice){
-            cout << termino.first << '\t'
-                 << termino.second.getL_docs().at(doc.getIdDoc()) << '\n';
-        }
-        return true;
-    } catch (const out_of_range& e){
-        return false;
-    }
-}
-
-void IndexadorHash::ListarDocs() const {
-    for(const auto& doc : indiceDocs){
-        cout << doc.first << '\t' << doc.second << '\n';
-    }
-}
-
-bool IndexadorHash::ListarDocs(const string &nomDoc) const {
-    try {
-        InfDoc doc = indiceDocs.at(nomDoc);
-        cout << nomDoc << '\t' << doc << '\n';
-        return true;
-    } catch (const out_of_range& e){
-        return false;
-    }
-}
-
-string IndexadorHash::getTermDisco(int line) const {
-    string str= "";
-    fstream infile;
-    infile.open(nombreDirectorio, ios::in);
-    if(!infile) {
-        cerr << "ERROR: " << nombreDirectorio << " fichero no encontrado.\n";
-    } else {
-        infile.seekg(ios::beg);
-        for (int i = 0; i < line; ++i) {
-            infile.ignore(numeric_limits<std::streamsize>::max(), '\n');
-        }
-        getline(infile, str);
-        infile.close();
-    }
-    return str;
-}
-
-void
-IndexadorHash::IndexarDocumento(const string& name, const int& id, const list<string> tokens) {
-    stemmerPorter stem;
-    int numPalDif = 0, numPalSinPar = 0, numPal = 0;
-    //cout << tokens.size() <<" numero de tokens" <<endl;
-
-    for (const auto& token : tokens) {
-        string t = token;
-        stem.stemmer(t, tipoStemmer);
-        cout<<t<< " palabra"<<endl;
-        // Si no es palabra de parada
-        if (stopWords.find(t) == stopWords.end()) {
-            cout<<t<< " palabra que no es un stopWord"<<endl;
-            ++numPalSinPar;
-            InformacionTermino term;
-            InfTermDoc termDoc;
-            if (indice.find(t) == indice.end()) {
-                ++numPalDif;
-                cout<<t<< " palabra diferente "<<numPalDif <<endl;
-                term.aumentoFtc();
-                termDoc.AumentoFt();
-                if (almacenarPosTerm) {
-                    termDoc.nuevaPosicionTermino(numPal);
-                }
-                term.nuevoL_docs(id, termDoc);
-                try {
-                    indice.insert(pair<string, InformacionTermino>(t, term));
-                } catch (const bad_alloc &e) {
-                    cerr << "ERROR: Falta de memoria principal. ";
-                    if (!almacenarEnDisco) {
-                        cerr << "Ultimo documento indexado: " << indiceDocs.end()->first
-                             << " Ultimo termino indexado: " << indice.end()->first << "\n";
-                        return;
-                    } else {
-                        cerr << "Ultimo termino indexado: " << auxDisco.end()->first << '\n';
-                        AlmacenarEnDisco(t, term);
-                    }
-                }
-            } else {
-                auto &term = indice.at(t);
-                term.aumentoFtc();
-
-                // Si el termino ya se habia encontrado en este documento
-                if (term.getL_docs().find(id) != term.getL_docs().end()) {
-                    termDoc = term.getL_docs().at(id);
-                    termDoc.AumentoFt();
-                    if (almacenarPosTerm) {
-                        termDoc.nuevaPosicionTermino(numPal);
-                    }
-                } else {
-                    ++numPalDif;
-                    termDoc.AumentoFt();
-                    if (almacenarPosTerm) {
-                        termDoc.nuevaPosicionTermino(numPal);
-                    }
-                    term.nuevoL_docs(id, termDoc);
-                }
-            }
-        }
-        ++numPal;
-    }
-    //cout << numPal <<" numero de palabras" <<endl;
-    struct stat buf;
-    stat(name.c_str(), &buf);
-
-    if (indiceDocs.find(name) == indiceDocs.end()) {
-        cout << numPalDif << " Creando un nuevo primer objeto resumen con la palabra"<< endl;
-        indiceDocs.insert(pair<string, InfDoc> (name, InfDoc(time(0),numPalDif, (int) *&buf.st_size, numPalSinPar, id, numPal)));
-    } else {
-        for ( auto & p : indiceDocs) {
-            if(p.first == name) {
-                cout << numPalDif << " numero de paralabras antes"<< endl;
-
-                numPalDif += p.second.getNumPalDiferentes();
-                numPalSinPar += p.second.getNumPalSinParada();
-                numPal += p.second.getNumPal();
-                time_t tiempo = p.second.getFechaModificacion();
-
-                cout << numPalDif << " numero de paralabras despues"<< endl;
-
-                indiceDocs.erase(name);
-                indiceDocs.insert(pair<string, InfDoc> (name, InfDoc(tiempo,numPalDif, (int) *&buf.st_size, numPalSinPar, id, numPal)));
-            }
-        }
-    }
-}
-
-int IndexadorHash::countFileLines(const string& filename) {
-    int count = -1;    // Variable to keep count of each line
-    fstream file;
-    file.open(filename, ios::in);
-    if(!file) {
-        cerr << "ERROR: " << filename << " fichero no encontrado.\n";
-    } else {
-        while(!file.eof()) {
-            count++;
-        }
-        file.close();
-    }
-    return count;
-}
-
-void IndexadorHash::AlmacenarEnDisco(const string& token, const InformacionTermino& termino) {
-    string line;
-    /**
-     * ftc:idDoc/ft/posTerm posTerm posTerm ...:idDoc/ft/posTerm posTerm posTerm...
-     */
-    int numLines = countFileLines(nombreDirectorio);
-    if (auxDisco.find(token) == auxDisco.end()) {
-        line = to_string(termino.getFtc()) + ':';
-        for (const auto& elem : termino.getL_docs()) {
-            line += to_string(elem.first) + '/' +
-                    to_string(elem.second.getFt()) + '/';
-            if (almacenarPosTerm) {
-                for (const auto& pos : elem.second.getPosTerm()) {
-                    line += to_string(pos) + ' ';
-                }
-            }
-            line += ':';
-        }
-        line.erase(prev(line.end())); // remove last ':'
-        fstream outfile;
-        outfile.open(nombreDirectorio, ios::app);
-        if (!outfile) {
-            cerr << "ERROR: fichero no se abre.\n";
-            return;
-        } else {
-            auxDisco.insert(pair<string, int>(token, numLines + 1));
-            outfile << line << '\n';
-        }
-        outfile.close();
-    } else {
-        fstream outfile, tempfile;
-        outfile.open(nombreDirectorio, ios::out);
-        tempfile.open("tempfile.txt", ios::in);
-        if (!outfile || !tempfile) {
-            cerr << "ERROR: fichero no se abre.\n";
-            return;
-        } else {
-            int myline = auxDisco.at(token);
-            int isline = 0;
-            while (getline(outfile, line)) {
-                if (myline == isline) {
-                    tempfile << to_string(termino.getFtc()) << ':';
-                    string aux = "";
-                    for (const auto& elem : termino.getL_docs()) {
-                        aux += to_string(elem.first) + '/' +
-                               to_string(elem.second.getFt()) + '/';
-                        if (almacenarPosTerm) {
-                            for (const auto& pos : elem.second.getPosTerm()) {
-                                aux += to_string(pos) + ' ';
-                            }
-                        }
-                        aux += ':';
-                    }
-                    aux.erase(prev(line.end()));
-                    tempfile << aux << '\n';
-                } else {
-                    tempfile << line << '\n';
-                }
-                ++isline;
-            }
-        }
-        outfile.close();
-        tempfile.close();
-        // delete the original file
-        remove(nombreDirectorio);
-        // rename old to new
-        rename("tempfile.txt",nombreDirectorio);
-    }
-}
-
-unordered_map<string, InfDoc> IndexadorHash::getIndiceDocs() const {
-    return indiceDocs;
-}
-
-InfColeccionDocs IndexadorHash::getInfColDocs() const {
-    return informacionColeccionDocs;
-}
-
-unordered_map<string, InformacionTerminoPregunta> IndexadorHash::getIndicePreg() const {
-    return indicePregunta;
-}
-
-unordered_map<string, InformacionTermino> IndexadorHash::getIndice() const {
-    return indice;
-}
-
-string IndexadorHash::getPregunta() const {
-    return pregunta;
-}
 /*
-bool
-IndexadorHash::Indexar(const string& docCarpeta){
-    fstream i;
-    list<string> elementos;
 
-    i.open(docCarpeta, ios::in);
-    if(i) {
-        cerr << "Error " << docCarpeta << " carpeta no existe.\n";
-        return false;
+// Constructor de copia
+IndexadorHash::IndexadorHash (const IndexadorHash& indexador)
+{
+    indice = indexador.indice;
+    indiceDocs = indexador.indiceDocs;
+    informacionColeccionDocs = indexador.informacionColeccionDocs;
+    pregunta = indexador.pregunta;
+    indicePregunta = indexador.indicePregunta;
+    infPregunta = indexador.infPregunta;
+    stopWords = indexador.stopWords;
+    ficheroStopWords = indexador.ficheroStopWords;
+    tok = indexador.tok;
+    directorioIndice = indexador.directorioIndice;
+    tipoStemmer = indexador.tipoStemmer;
+    almacenarEnDisco = indexador.almacenarEnDisco;
+    almacenarPosTerm = indexador.almacenarPosTerm;
+}
+
+// Constructor por defecto
+IndexadorHash::IndexadorHash ()
+{
+    pregunta = "";
+    directorioIndice = "";
+    tipoStemmer = 0;
+    almacenarEnDisco = false;
+    almacenarPosTerm = false;
+}
+
+// Destructor
+IndexadorHash::~IndexadorHash ()
+{
+    indice.clear();
+    indiceDocs.clear();
+    informacionColeccionDocs.~InfColeccionDocs();
+    pregunta.clear();
+    indicePregunta.clear();
+    infPregunta.~InformacionPregunta();
+    stopWords.clear();
+    ficheroStopWords.clear();
+    //tok.~Tokenizador();
+    tipoStemmer = 0;
+    almacenarEnDisco = false;
+    almacenarPosTerm = false;
+}
+
+// Operador asignación
+IndexadorHash&
+IndexadorHash::operator= (const IndexadorHash& indexador)
+{
+    if (this != &indexador)
+    {
+        this->~IndexadorHash();
+        // Se copia
+        indice = indexador.indice;
+        indiceDocs = indexador.indiceDocs;
+        informacionColeccionDocs = indexador.informacionColeccionDocs;
+        pregunta = indexador.pregunta;
+        indicePregunta = indexador.indicePregunta;
+        infPregunta = indexador.infPregunta;
+        stopWords = indexador.stopWords;
+        ficheroStopWords = indexador.ficheroStopWords;
+        tok = indexador.tok;
+        directorioIndice = indexador.directorioIndice;
+        tipoStemmer = indexador.tipoStemmer;
+        almacenarEnDisco = indexador.almacenarEnDisco;
+        almacenarPosTerm = indexador.almacenarPosTerm;
     }
 
-    while(!i.eof()) {
-        string doc, line;
-        i >> doc;
-        if (doc == "") {
+    return *this;
+}
+
+IndexadorHash::IndexadorHash (const string& fichStopWords, const string& delimitadores,
+                              const bool& detectComp, const bool& minuscSinAcentos, const string& dirIndice,
+                              const int& tStemmer, const bool& almEnDisco, const bool& almPosTerm)
+{
+    ficheroStopWords = fichStopWords;
+    // Almacena todas las stopwords del fichero
+    almacenarStopWords();
+    // Se inicializa el tokenizador
+    tok.DelimitadoresPalabra(delimitadores);
+    tok.CasosEspeciales(detectComp);
+    tok.PasarAminuscSinAcentos(minuscSinAcentos);
+    directorioIndice = dirIndice;
+    if (directorioIndice.empty())
+    { // Si está vacío
+        // Se almacenará en el directorio donde se ejecuta el proyecto
+        directorioIndice = "./";
+    }
+    tipoStemmer = tStemmer;
+    almacenarEnDisco = almEnDisco;
+    almacenarPosTerm = almPosTerm;
+}
+
+bool
+IndexadorHash::almacenarStopWords ()
+{
+    ifstream fLectura;
+    string linea = ""; // En cada línea habrá una stopWord
+
+    fLectura.open(ficheroStopWords.c_str());
+
+    if (fLectura.is_open())
+    { // Si se abre el fichero del que se quiere leer
+        while (!fLectura.eof())
+        { // Mientras no se llegue al final del fichero
+            linea = "";
+            // Se lee la línea (que contiene una palabra)
+            getline(fLectura, linea);
+            if (!linea.empty())
+            { // Si la línea no está vacía
+                // Se inserta a stopWords
+                stopWords.insert(linea);
+            }
+        }
+        fLectura.close();
+        return true;
+    }
+
+    cerr << "ERROR: No existe el archivo: -" << ficheroStopWords << "-" << endl;
+    return false;
+}
+*/
+
+
+IndexadorHash::IndexadorHash(const string& directorioIndexacion) {
+    directorioIndice = directorioIndexacion;
+}
+
+string
+IndexadorHash::aplicarStemming(const string& pal) const
+{
+    string aux = pal;
+
+    if (DevolverPasarAminuscSinAcentos())
+    {
+        tok.PasarAminuscSinAcentosFun(aux);
+    }
+    stemmerPorter stemmer;
+    stemmer.stemmer(aux, tipoStemmer);
+
+    return aux;
+}
+
+/*
+void
+IndexadorHash::reindexarDocumento (const string& nombreDoc, const unordered_map<string, InfDoc>::iterator& itDoc, const off_t& tamB, const time_t& fMod)
+{
+    long int auxId = itDoc->second.getIdDoc();
+    // Se elimina toda la información del índice
+    BorraDoc(nombreDoc);
+    // Se vuelve a insertar el documento
+    unordered_map<string, InfDoc>::iterator posicion = indiceDocs.insert(pair<string, InfDoc>(nombreDoc,InfDoc())).first;
+    // Se establece la antigua id del documento
+    posicion->second.setIdDoc(auxId);
+    // Se establece la fecha de modificación
+    posicion->second.setFechaModificacion(fMod);
+    // Se establece el tamaño del documento
+    posicion->second.setTamBytes(tamB);
+    // Se indexa
+    indexarDocumento(nombreDoc, itDoc);
+}
+
+
+// Devuelve TRUE si recuperan los documentos correctamente
+bool
+IndexadorHash::cargarDocsAindexar (const string& ficheroDocumentos, list<string>& listaDocs) const
+{
+    ifstream f;
+    struct stat infoFichcero;
+    f.open(ficheroDocumentos.c_str());
+
+    if (f.is_open())
+    {
+        string linea;
+        while (!f.eof())
+        {
+            getline(f, linea);
+            if (!linea.empty())
+            {
+                if (stat(linea.c_str(), &infoFichcero) == 0)
+                { // Si el fichero existe
+                    listaDocs.push_back(linea);
+                }
+                else
+                {
+                    cout << "ERROR: No se ha encontrado el fichero " << linea << endl;
+                }
+
+            }
+        }
+
+        f.close();
+
+        return true;
+    }
+
+    return false;
+}
+
+// Devuelve TRUE si se crea el índice para la colección de documentos de "ficheroDocumentos".
+bool
+IndexadorHash::Indexar (const string& ficheroDocumentos)
+{
+    list<string> listaDocsIndexar;
+
+    if (cargarDocsAindexar(ficheroDocumentos, listaDocsIndexar))
+    { // Si se han cargado los ficheros correctamente
+        // Se indexa cada uno de ellos
+        try
+        {
+            long int auxNumDocs = 0;
+            pair<unordered_map<string, InfDoc>::iterator, bool> insercionDoc;
+            for (string doc : listaDocsIndexar)
+            { // Para cada documento
+                // Se intenta insertar
+                insercionDoc = indiceDocs.insert(pair<string, InfDoc>(doc, InfDoc()));
+                if (insercionDoc.second)
+                { // Si el documento ha sido insertado (no había sido indexado)
+                    // Se le asigna una id
+                    insercionDoc.first->second.setIdDoc(id);
+                    // Se incrementa el número de documentos en la indexación
+                    auxNumDocs++;
+                    // Se tokeniza
+                    tok.Tokenizar(doc, "tokens.tk");
+                    // Se indexa el documento
+                    indexarDocumento(doc, insercionDoc.first);
+                    // Se incrementa la id del documento, para el siguiente
+                    id++;
+                }
+                else
+                { // Si ya había sido indexado
+                    // Se extrae la información del fichero
+                    struct stat infoFichero;
+                    stat(doc.c_str(), &infoFichero);
+                    if (difftime(infoFichero.st_mtime, insercionDoc.first->second.getFechaModificacion()) > 0)
+                    { // Si la fecha de modificación es más reciente (mayor)
+                        // Se reindexa
+                        reindexarDocumento(doc, insercionDoc.first, infoFichero.st_size, infoFichero.st_mtime);
+                    }
+                }
+            }
+            informacionColeccionDocs.aumentoNumDocs(auxNumDocs);
+            return true;
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
             return false;
         }
-        else{
-            fstream i2;
-            i2.open(doc, ios::in);
-            if(!i2) {
-                cerr << "Error " << doc << " carpeta no existe.\n";
-                return false;
+    }
+    else
+    {
+        cout << "ERROR: En Indexar con el documento " << ficheroDocumentos << endl;
+    }
+
+    return false;
+}
+
+
+// Indexa el documento que se pasa por parámetro
+void
+IndexadorHash::ficheroTratar (const string& nombreDoc, const unordered_map<string, InfDoc>::iterator& itDoc)
+{
+    // Se recupera la tokenización, para indexar las palabras del documento
+    ifstream token;
+    token.open("tokens.tk");
+
+    // Se recupera la tokenización
+    string linea;
+    list<string> tokenizacion;
+    if (token.is_open())
+    {
+        while (!token.eof())
+        {
+            getline(token, linea);
+            if (!linea.empty())
+            {
+                tokenizacion.push_back(linea);
             }
+        }
+        token.close();
+    }
 
-            elementos.clear();
-            while (getline(i2, line)) {
-                if (line != "") {
-                    tok.Tokenizar(line, elementos);
-                    int id;
-                    // Si el documento ya ha sido indexado
-                    if (indiceDocs.find(doc) != indiceDocs.end()) {
-                        time_t t = indiceDocs.at(doc).getFechaModificacion();
+    struct stat buf;
+    stat(nombreDoc.c_str(), &buf);
 
-                        // Si la fecha actual es mas reciente que la almacenada
-                        if (time(0) > t) {
-                            id = indiceDocs.at(doc).getIdDoc();
-                            BorraDoc(doc);
-                        }
-                    } else {
-                        id = indiceDocs.size() + 1;
+    // Se almacena el tamaño en bytes del documento
+    itDoc->second.setTamBytes(*&buf.st_size);
+    // Se almacena la cantidad de palabras del documento
+    itDoc->second.setNumPal(tokenizacion.size());
+    // Se indexa cada palabra
+    string palabra;
+    int posicionPal = -1;
+    // Número de palabras sin stopwords en el documento
+    int auxNumPalSinParada = 0;
+    // Número de palabras diferentes en el documento
+    int auxNumPalDiferentes = 0;
+    // Número de nuevas palabras indexadas
+    int auxNuevasPal = 0;
+    // Posición de la palabra en el ínidice
+    pair<unordered_map<string, InformacionTermino>::iterator, bool> insercionPal;
+
+    for (list<string>::const_iterator pos = tokenizacion.cbegin(); pos != tokenizacion.cend(); pos++)
+    {
+        if (almacenarPosTerm)
+        {
+            posicionPal++;
+        }
+        palabra = aplicarStemming(pos->data());
+        if (stopWords.find(palabra) == stopWords.cend())
+        { // Si la palabra no es una stopword (si lo es, se ignora)
+            // Se incrementa el número de palabras que no son stopwords en el documento
+            auxNumPalSinParada++;
+            // Se intenta insertar la palabra
+            insercionPal = indice.insert(pair<string, InformacionTermino>(palabra,InformacionTermino()));
+            if (insercionPal.second)
+            { // Si la palabra se ha insertado (es nueva en el índice)
+                // Se incrementa el número de nuevas palabras indexadas
+                auxNuevasPal++;
+                // Se incrementa el número de palabras diferentes en el documento
+                auxNumPalDiferentes++;
+            }
+            else if (!insercionPal.first->second.contieneEnDoc(itDoc->second.getIdDoc()))
+            { // Si es nueva en el documento
+                // Se incrementa el número de palabras diferentes en el documento
+                auxNumPalDiferentes++;
+            }
+            // Se incrementa la frecuencia del término
+            insercionPal.first->second.incrementarFrecuencia(itDoc->second.getIdDoc(), posicionPal);
+        }
+    }
+    itDoc->second.aumentoNumPalDiferentes(auxNumPalDiferentes);
+    itDoc->second.aumentoNumPalSinParada(auxNumPalSinParada);
+
+    informacionColeccionDocs.aumentoTamBytes(itDoc->second.getTamBytes());
+    informacionColeccionDocs.aumentoNumTotalPalSinParada(auxNumPalSinParada);
+    informacionColeccionDocs.aumentoNumTotalPal(tokenizacion.size());
+    informacionColeccionDocs.aumentoNumTotalPalDiferentes(auxNuevasPal);
+}
+*/
+
+
+
+void
+IndexadorHash::ficheroTratar (const string& nombre, const unordered_map<string, InfDoc>::iterator& mapaDoc)
+{
+    int auxNumPalSinParada = 0;
+    int auxNumPalDiferentes = 0;
+    int auxNuevasPal = 0;
+    int posicionPal = 0;
+    string line = "";
+
+    pair<unordered_map<string, InformacionTermino>::iterator, bool> anadirPal;
+
+    auto listaTokens= recogerTokens(nombre, mapaDoc);
+
+    for(auto elem : listaTokens)
+    {
+        line = aplicarStemming(elem);
+
+        if (stopWords.find(line) == stopWords.cend())
+        {
+            auxNumPalSinParada++;
+            anadirPal = indice.insert(pair<string, InformacionTermino>(line, InformacionTermino()));
+            if (anadirPal.second)
+            {
+                auxNuevasPal++;
+                auxNumPalDiferentes++;
+            }
+            else if (!anadirPal.first->second.contieneEnDoc(mapaDoc->second.getIdDoc()))
+            {
+                auxNumPalDiferentes++;
+
+            }
+            anadirPal.first->second.incrementarFrecuencia(mapaDoc->second.getIdDoc(), posicionPal);
+        }
+        if (almacenarPosTerm)
+        {
+            posicionPal++;
+        }
+    }
+
+    informacionColeccionDocs.aumentoTamBytes(mapaDoc->second.getTamBytes());
+    informacionColeccionDocs.aumentoNumTotalPalSinParada(auxNumPalSinParada);
+    informacionColeccionDocs.aumentoNumTotalPal(listaTokens.size());
+    informacionColeccionDocs.aumentoNumTotalPalDiferentes(auxNuevasPal);
+
+    mapaDoc->second.aumentoNumPalDiferentes(auxNumPalDiferentes);
+    mapaDoc->second.aumentoNumPalSinParada(auxNumPalSinParada);
+}
+
+
+
+list<string>
+IndexadorHash::recogerTokens (const string& nombre, const unordered_map<string, InfDoc>::iterator& mapaDoc) {
+    struct stat buf;
+    stat(nombre.c_str(), &buf);
+
+    mapaDoc->second.setTamBytes(*&buf.st_size);
+
+    string line = "";
+
+    ifstream docToken;
+
+    docToken.open("tokens.tk");
+
+    list<string> listaTokens;
+    if (docToken) {
+        while (!docToken.eof()) {
+            getline(docToken, line);
+            if (line != "") {
+                listaTokens.push_back(line);
+            }
+        }
+        docToken.close();
+    }
+
+    mapaDoc->second.setNumPal(listaTokens.size());
+    return listaTokens;
+}
+
+
+bool
+IndexadorHash::Indexar (const string& nombreDoc)
+{
+    bool info = false;
+    list<string> DocsAIndexar;
+
+    struct stat detallesFichero;
+    string line = "";
+
+    int numDocs = 0;
+    pair<unordered_map<string, InfDoc>::iterator, bool> meterDocumento;
+
+    ifstream f;
+
+    f.open(nombreDoc.c_str());
+
+    if (f) {
+        while (!f.eof()) {
+            getline(f, line);
+            if (line != "") {
+                if (stat(line.c_str(), &detallesFichero) != 0) {
+                    cout << "ERROR: No se ha encontrado el fichero " << line << endl;
+                } else {
+                    DocsAIndexar.push_back(line);
+                }
+
+            }
+        }
+
+        f.close();
+        info = true;
+    }
+    if(info){
+        try
+        {
+            for (string elem : DocsAIndexar)
+            {
+                meterDocumento = indiceDocs.insert(pair<string, InfDoc>(elem, InfDoc()));
+                if (meterDocumento.second)
+                {
+                    numDocs++;
+                    meterDocumento.first->second.setIdDoc(id);
+                    tok.Tokenizar(elem, "tokens.tk");
+                    ficheroTratar(elem, meterDocumento.first);
+
+                    id++;
+                }
+                else
+                {
+                    struct stat datosDoc;
+                    stat(elem.c_str(), &datosDoc);
+                    if (difftime(datosDoc.st_mtime, meterDocumento.first->second.getFechaModificacion()) > 0)
+                    {
+                        int id = meterDocumento.first->second.getIdDoc();
+
+                        BorraDoc(elem);
+
+                        unordered_map<string, InfDoc>::iterator posicion = indiceDocs.insert(pair<string, InfDoc>(elem, InfDoc())).first;
+
+                        posicion->second.setIdDoc(id);
+                        posicion->second.setFechaModificacion(datosDoc.st_mtime);
+                        posicion->second.setTamBytes(datosDoc.st_size);
+
+                        ficheroTratar(elem, meterDocumento.first);
                     }
-                    //
-                    stemmerPorter stem;
-                    int numPalDif = 0, numPalSinPar = 0, numPal = 0;
-
-                    for (const auto& token : elementos) {
-                        string t = token;
-                        stem.stemmer(t, tipoStemmer);
-                        // Si no es palabra de parada
-                        if (stopWords.find(t) == stopWords.end()) {
-                            ++numPalSinPar;
-                            InformacionTermino term;
-                            InfTermDoc termDoc;
-                            if (indice.find(t) == indice.end()) {
-                                ++numPalDif;
-                                term.aumentoFtc();
-                                termDoc.AumentoFt();
-                                if (almacenarPosTerm) {
-                                    termDoc.nuevoPosTerm(numPal);
-                                }
-                                term.nuevoL_docs(id, termDoc);
-                                try {
-                                    indice.insert(pair<string, InformacionTermino>(t, term));
-                                } catch (const bad_alloc &e) {
-                                    cerr << "Error, falta de memoria";
-                                    if (!almacenarEnDisco) {
-                                        cerr << "Ultimo documento indexado: " << indiceDocs.end()->first
-                                             << " Ultimo termino indexado: " << indice.end()->first << "\n";
-                                        break;
-                                    } else {
-                                        cerr << "Ultimo termino indexado: " << auxDisco.end()->first << '\n';
-                                        AlmacenarEnDisco(t, term);
-                                    }
-                                }
-                            } else {
-                                term = indice.at(t);
-                                term.aumentoFtc();
-                                // Si el termino ya se habia encontrado en este documento
-                                if (term.getL_docs().find(id) != term.getL_docs().end()) {
-                                    termDoc = term.getL_docs().at(id);
-                                    termDoc.AumentoFt();
-                                    if (almacenarPosTerm) {
-                                        termDoc.nuevoPosTerm(numPal);
-                                    }
-                                } else {
-                                    ++numPalDif;
-                                    termDoc.AumentoFt();
-                                    if (almacenarPosTerm) {
-                                        termDoc.nuevaPosicionTermino(numPal);
-                                    }
-                                    term.nuevoL_docs(id, termDoc);
-                                }
-                            }
-                        }
-                        ++numPal;
-                    }
-                    struct stat buf;
-                    stat(doc.c_str(), &buf);
-                    indiceDocs.insert(pair<string, InfDoc> (doc, InfDoc(id, numPal, numPalSinPar, numPalDif, (int) *&buf.st_size, time(0))));
-                    //
-
-                    ObtenerInfo();
                 }
             }
-            i2.close();
+            informacionColeccionDocs.aumentoNumDocs(numDocs);
+            return true;
         }
+        catch(const exception e)
+        {
+            cerr << e.what() << '\n';
+            return false;
+        }
+    }else{
+        cout << "ERROR: En Indexar con el documento " << nombreDoc << endl;
+        return false;
     }
     return false;
 }
 
 
-bool
-IndexadorHash::IndexarDirectorio(const string& dirAIndexar){
-
-}
 
 bool
-IndexadorHash::GuardarIndexacion() const{
+IndexadorHash::IndexarDirectorio (const string& dirAIndexar)
+{
+  // Puntero para abrir el directorio
+  DIR *directorio;
+  // Información del fichero que se lee
+  struct dirent *infFichero;
 
+  // Se abre el directorio
+  directorio = opendir(dirAIndexar.c_str());
+  if (directorio)
+  { // El directorio existe
+    string comando = "find " + dirAIndexar + " -type f | sort > " + "directorio.txt";
+    system(comando.c_str());
+
+    closedir(directorio);
+    return Indexar("directorio.txt");
+  }
+
+  //cout << "ERROR: No se pudo abrir el directorio " << dirAIndexar << endl;
+  return false;
 }
 
+/* Se guardará en disco duro (incluidos todos los parámetros de la parte privada)
+    Devolverá TRUE si finaliza la operación correcctamente
+*/
 bool
-IndexadorHash::RecuperarIndexacion (const string& directorioIndexacion){
+IndexadorHash::GuardarIndexacion () const
+{
+  // Se crean los punteros para manejar la ruta del directorio
+  DIR *directorio;
+  struct dirent *entrada;
 
+  // Se intenta abrir el directorio de "directorioIndice"
+  directorio = opendir(directorioIndice.c_str());
+  if (!directorio)
+  { // Si no existe
+    // Se crea
+    string comando = "mkdir " + directorioIndice;
+    system(comando.c_str());
+    // Se vuelve a intentar abrir el directorio
+    directorio = opendir(directorioIndice.c_str());
+  }
+
+  if (directorio)
+  { // Si el directorio existe o ha sido creado correctamente
+    // Abre o crea el fichero donde se guardará la indexación
+    ofstream ficheroIndexacion("indexado.txt");
+
+    //TODO
+  }  
+
+  return false;
 }
 
-bool
-IndexadorHash::IndexarPregunta(const string& preg){
-
-}
-
-bool
-IndexadorHash::DevuelvePregunta(string& preg) const{
-
-}
-
-bool
-IndexadorHash::DevuelvePregunta(const string& word, InformacionTerminoPregunta& inf) const{
-
-}
-
-bool
-IndexadorHash::DevuelvePregunta(InformacionPregunta& inf) const{
-
-}
-
-bool
-IndexadorHash::Devuelve(const string& word, InformacionTermino& inf) const{
-
-}
-
-bool
-IndexadorHash::Devuelve(const string& word, const string& nomDoc, InfTermDoc& InfDoc) const{
-
-}
-
-bool
-IndexadorHash::Existe(const string& word) const{
-
-}
-
-bool
-IndexadorHash::Borra(const string& word){
-
-}
-
-bool
-IndexadorHash::BorraDoc(const string& nomDoc){
-
-}
-
-void IndexadorHash::RestablecerDocsIndice() {
-    indiceDocs.clear();
-    indice.clear();
-}
-
-void IndexadorHash::RestablecerPregIndice() {
-    indicePregunta.clear();
-}
-
-bool
-IndexadorHash::Actualiza(const string& word, const InformacionTermino& inf){
-
-}
-
-bool IndexadorHash::Inserta(const string& word, const InformacionTermino& inf) {
-    return indice.insert(pair<string, InformacionTermino>(word, inf)).second;
-}
-
-int IndexadorHash::NumPalIndexadas() const {
-    return indice.size();
-}
-
-std::string IndexadorHash::DevolverFichPalParada() const {
-    return ficheroStopWords;
-}
-
-void IndexadorHash::ListarPalParada() const {
-    fstream infile;
-    infile.open(ficheroStopWords, ios::in);
-    if (!infile) {
-        cerr << "ERROR: No existe el fichero: " << ficheroStopWords << "\n";
-    }
-
-    while(!infile.eof()){
-        string line;
-        infile >> line;
-        cout << line << '\n';
-    }
-
-    infile.close();
-}
-
-int
-IndexadorHash::NumPalParada() const {
-    return stopWords.size();
-}
-
-string
-IndexadorHash::DevolverDelimitadores() const {
-    return tok.DelimitadoresPalabra();
-}
-
-bool
-IndexadorHash::DevolverCasosEspeciales() const {
-    return tok.CasosEspeciales();
-}
-
-bool
-IndexadorHash::DevolverPasarAminuscSinAcentos() const {
-    return tok.PasarAminuscSinAcentos();
-}
-
-string
-IndexadorHash::DevolverDirIndice() const {
-    return directorioIndice;
-}
-
-int
-IndexadorHash::DevolverTipoStemming() const {
-    return tipoStemmer;
-}
-
-bool
-IndexadorHash::DevolverAlmacenarPosTerm() const {
-    return almacenarPosTerm;
-}
-
-bool
-IndexadorHash::DevolverAlmEnDisco() const {
-    return almacenarEnDisco;
-}
-
+// Lista el contenido del campo "indice" y del campo "indiceDocs"
 void
-IndexadorHash::ListarInfColeccDocs() const {
-    cout << informacionColeccionDocs << '\n';
-}
+IndexadorHash::ImprimirIndexacion () const
+{
 
-void
-IndexadorHash::ListarTerminos() const {
-    for (const auto& termino : indice){
-        cout << termino.first << '\t' << termino.second << '\n';
-    }
+  cout<< "Terminos indexados: \n";
+  // Lista el contenido de campo "indice"
+  for (auto termino = indice.begin(); termino != indice.end(); termino++)
+  {
+    cout<< " " << termino->first << "\t" << termino->second << "\n";
+  }
+  cout << "Documentos indexados: ";
+  // Lista el contenido del campo indiceDocs
+  for (auto doc = indiceDocs.begin(); doc != indiceDocs.end(); doc++)
+  {
+    cout << doc->first + "\t" << doc->second << "\n";
+  }
+
 }
 
 bool
-IndexadorHash::ListarTerminos(const string& nomDoc) const {
-    try {
-        auto doc = indiceDocs.at(nomDoc);
-        for(const auto& termino : indice){
-            cout << termino.first << '\t'
-                 << termino.second.getL_docs().at(doc.getIdDoc()) << '\n';
+IndexadorHash::IndexarPregunta (const string& preg)
+{
+  // Se vacían campos
+  indicePregunta.clear();
+  infPregunta.~InformacionPregunta();
+
+  if (!preg.empty())
+  {
+    try
+    {
+      pregunta = preg;
+      // Número de palabras que no son stopword en la pregunta
+      int auxNumPalSinParada = 0;
+      // Número de nuevas palabras indexadas
+      int auxNuevasPal = 0;
+      // Posición de la palabra en la pregunta
+      int posicion = -1;
+
+      // Se tokeniza
+      list<string> tokenizacion;
+      tok.Tokenizar(preg, tokenizacion);
+      // Se almacena la cantidad de palabras de la pregunta
+        infPregunta.aumentoNumTotalPal(tokenizacion.size());
+      
+      // Para cada palabra
+      for (string palabra : tokenizacion)
+      {
+        if (almacenarPosTerm)
+        {
+          posicion++;
         }
-        return true;
-    } catch (const out_of_range& e){
-        return false;
-    }
-}
+        if (stopWords.find(palabra) == stopWords.cend())
+        { // Si no es una stopword
+          auxNumPalSinParada++;
+          // Se inserta en el índice de la pregunta
+          pair<unordered_map<string, InformacionTerminoPregunta>::iterator, bool> insercionPal = indicePregunta.insert(pair<string, InformacionTerminoPregunta>(palabra, InformacionTerminoPregunta()));
+          if (insercionPal.second)
+          { // Si ha sido insertado (nueva palabra)
+            auxNuevasPal++;
+          }
+          // Se incrementa la frecuencia del término en la pregunta y se almacena la posición en la que aparece la palabra en la pregunta
+          insercionPal.first->second.incrementarFrecuencia(posicion);
+        }
+      }
+      // Se incrementa el número de palabras que no son stopwords en la pregunta
+        infPregunta.aumentoNumTotalPalSinParada(auxNumPalSinParada);
+      // Se actualiza el número de palabras diferentes en la pregunta
+        infPregunta.aumentoNumTotalPalDiferentes(auxNuevasPal);
 
-void
-IndexadorHash::ListarDocs() const {
-    for(const auto& doc : indiceDocs){
-        cout << doc.first << '\t' << doc.second << '\n';
+      return true;
     }
+    catch(const std::exception& e)
+    {
+      std::cerr << e.what() << '\n';
+    }
+  }
+
+  cout << "ERROR: No se ha podido indexar la pregunta al estar vacía\n";
+  return false;
 }
 
 bool
-IndexadorHash::ListarDocs(const string &nomDoc) const {
-    try {
-        InfDoc doc = indiceDocs.at(nomDoc);
-        cout << nomDoc << '\t' << doc << '\n';
-        return true;
-    } catch (const out_of_range& e){
-        return false;
-    }
+IndexadorHash::DevuelvePregunta (string& preg) const
+{
+  if (!indicePregunta.empty())
+  {
+    preg = pregunta;
+
+    return true;
+  }
+
+  return false;
 }
 
-//Auxiliares
- */
+bool
+IndexadorHash::DevuelvePregunta (const string& word, InformacionTerminoPregunta& inf) const
+{
+  string palabra = aplicarStemming(word);
+  unordered_map<string, InformacionTerminoPregunta>::const_iterator posicion = indicePregunta.find(palabra);
+
+  if (posicion != indicePregunta.cend())
+  { // Si encuentra la palabra  
+    inf = posicion->second;
+
+    return true;
+  }
+
+  return false;
+}
+
+bool
+IndexadorHash::DevuelvePregunta (InformacionPregunta& inf) const
+{
+  if (!indicePregunta.empty())
+  {
+    inf = infPregunta;
+
+    return true;
+  }
+
+  return false;
+}
 
 void
-IndexadorHash::ObtenerInfo() {
-    int auxNumPal = 0;
-    int auxNumPalSinParada = 0;
-    int auxTamBytes = 0;
+IndexadorHash::ImprimirIndexacionPregunta ()
+{
+  cout << "Pregunta indexada: " << pregunta << "\nTerminos indexados en la pregunta: \n";
+  // Se lista el contenido de "indicePregunta"
+  for (unordered_map<string, InformacionTerminoPregunta>::const_iterator pos = indicePregunta.cbegin(); pos != indicePregunta.cend(); pos++)
+  {
+    cout << pos->first << "\t" << pos->second << "\n";
+  }
+  cout << infPregunta;
+}
 
-    for (const pair <string,InfDoc>& indc : indiceDocs) {
-        auxNumPal += indc.second.getNumPal();
-        auxNumPalSinParada += indc.second.getNumPalSinParada();
-        auxTamBytes += indc.second.getTamBytes();
+void
+IndexadorHash::ImprimirPregunta ()
+{
+  cout << "Pregunta indexada: " << pregunta <<
+    "\nInformacion de la pregunta: " << infPregunta;
+}
+
+// Devuelve TRUE si word ha sido indexado y devuelve la información en inf
+bool
+IndexadorHash::Devuelve (const string& word, InformacionTermino& inf) const
+{
+  string palabra;
+
+  if (Existe(word))
+  {
+    palabra = aplicarStemming(word);
+    inf = indice.at(palabra);
+    return true;
+  }
+
+  return false;
+}
+
+/* Devuelve TRUE si word ha sido indexado y aparece en el documento de nombre nomDoc.
+    Devuelve la información almacenada para word en el documento
+*/
+bool
+IndexadorHash::Devuelve (const string& word, const string& nomDoc, InfTermDoc& infDoc) const
+{
+  unordered_map<string, InfDoc>::const_iterator documento = indiceDocs.find(nomDoc);
+
+  if (Existe(word) && documento != indiceDocs.cend())
+  { // Si existe la palabra indexada y el documento
+    // Se trata el termino
+    string termino = aplicarStemming(word);
+    unordered_map<string, InformacionTermino>::const_iterator infoTermino = indice.find(termino);
+    // Se recupera la información del término en el documento
+    infDoc = infoTermino->second.getInfTermDoc(documento->second.getIdDoc());
+    return true;
+  }
+
+  // Si no devuelve infDoc vacío
+  infDoc.~InfTermDoc();
+  return false;
+}
+
+bool
+IndexadorHash::Existe (const string& word) const
+{
+  string palabra = word;
+
+    aplicarStemming(palabra);
+
+  return indice.find(palabra) != indice.end();
+}
+
+bool
+IndexadorHash::Borra (const string& word)
+{
+  if (Existe(word))
+  {
+    string palabra = aplicarStemming(word);
+    indice.erase(palabra);
+    return true;
+  }
+
+  return false;
+}
+
+bool
+IndexadorHash::BorraDoc (const string& nomDoc)
+{
+  // Se recupera el puntero del nombre del documento
+  unordered_map<string, InfDoc>::iterator posicion = indiceDocs.find(nomDoc);
+
+  if (posicion != indiceDocs.end())
+  {
+    // Se actualizan los datos de la colección (incrementando en negativo)
+      informacionColeccionDocs.aumentoNumDocs(-1);
+      informacionColeccionDocs.aumentoNumTotalPal(-posicion->second.getNumPal());
+      informacionColeccionDocs.aumentoNumTotalPalSinParada(-posicion->second.getNumPalSinParada());
+      //informacionColeccionDocs.aumentoNumTotalPalDiferentes(-posicion->second.getNumPalDiferentes());
+      informacionColeccionDocs.aumentoTamBytes(-posicion->second.getTamBytes());
+
+    // Se borran todos los términos del documento
+    long int id = posicion->second.getIdDoc();
+    // Se busca en todos los términos indexados
+    unordered_map<long int, InfTermDoc>::const_iterator posIndice;
+    // Controla que la posición anterior tenga que ser eliminada
+    string eliminar = "";
+    for (unordered_map<string, InformacionTermino>::iterator pos = indice.begin(); pos != indice.end(); pos++)
+    { // Para cada elemento del índice
+      if (!eliminar.empty())
+      { // Si hay un término para eliminar
+        indice.erase(eliminar);
+        eliminar = "";
+      }
+      // Comprueba que pertenezca al documento
+      if (pos->second.contieneEnDoc(id))
+      { // Si pertenece al documento
+        // Se elimina
+          pos->second.suprimirDocumento(id);
+        if (pos->second.getL_docs().empty())
+        { // Si el término no aparece en más documentos, se debe eliminar
+          eliminar = pos->first;
+        }
+      }
+    }
+    // Para comprobar si el último también debe ser eliminado
+    if (!eliminar.empty())
+    { // Si hay un término para eliminar
+      indice.erase(eliminar);
     }
 
-    informacionColeccionDocs = InfColeccionDocs();
-
-    informacionColeccionDocs.setNumDocs(indiceDocs.size());
-    informacionColeccionDocs.setNumTotalPal(auxNumPal);
-    informacionColeccionDocs.setTamBytes(auxTamBytes);
-    informacionColeccionDocs.setNumTotalPalSinParada(auxNumPalSinParada);
+    // Después se actualiza la colección de documentos
     informacionColeccionDocs.setNumTotalPalDiferentes(indice.size());
+    // Se elimina del índice de documentos
+    indiceDocs.erase(nomDoc);
+
+    return true;
+  }
+
+  return false;
 }
 
+// Borra todos los términos del índice de documentos
 void
-IndexadorHash::GuardarPalabrasParada(){
+IndexadorHash::VaciarIndiceDocs ()
+{
+  indiceDocs.clear();
+}
 
+// Borra todos los términos del índice de la pregunta
+void
+IndexadorHash::VaciarIndicePreg ()
+{
+  indicePregunta.clear();
+}
+
+// Sustituye la información almacenada en el índice por la de "inf"
+bool
+IndexadorHash::Actualiza (const string& word, const InformacionTermino& inf)
+{
+  if (Existe(word))
+  { // Si existe
+    // Actualiza la información del término indexado
+    string termino = aplicarStemming(word);
+    indice.at(termino) = inf;
+
+    return true;
+  }
+
+  return false;
+}
+
+/* Se insertará la palabra (habiendo aplicado aplicarStemming y mayúsculas) si no
+    estaba previamente indexada
+*/
+bool
+IndexadorHash::Inserta (const string& word, const InformacionTermino& inf)
+{
+  if (Existe(word))
+  { // Si el término no ha sido indexado
+    string termino = aplicarStemming(word);
+    // Se inserta
+    pair<string, InformacionTermino> nuevoTermino(termino, inf);
+    indice.insert(nuevoTermino);
+    return true;
+  }
+
+  return false;
+}
+
+// Devuelve el número de términos diferentes indexados
+int
+IndexadorHash::NumPalIndexadas () const
+{
+  return indice.size();
+}
+
+// Devuelve el contenido del campo "ficheroStopWords"
+string
+IndexadorHash::DevolverFichPalParada () const
+{
+  return ficheroStopWords;
+}
+
+// Muestra por pantalla las palabras de parada almacenadas
+void
+IndexadorHash::ListarPalParada () const
+{
+  string salida;
+
+  for (const string& palParada : stopWords)
+  {
+    salida += palParada + "\n";
+  }
+
+  cout << salida;
+}
+
+// Devuelve el número de palabras de parada almacenadas
+int
+IndexadorHash::NumPalParada () const
+{
+  return stopWords.size();
+}
+
+// Devuelve los delimitadores utilizados por el tokenizador
+string
+IndexadorHash::DevolverDelimitadores () const
+{
+  return tok.DelimitadoresPalabra();
+}
+
+// Devuelve si el tokenizador analiza los casos especiales
+bool
+IndexadorHash::DevolverCasosEspeciales () const
+{
+  return tok.CasosEspeciales();
+}
+
+// Devuelve si el tokenizador pasa a minúsculas sin acentos
+bool
+IndexadorHash::DevolverPasarAminuscSinAcentos () const
+{
+  tok.PasarAminuscSinAcentos();
+}
+
+// Devuelve el valor de almacenarPosTerm
+bool
+IndexadorHash::DevolverAlmacenarPosTerm () const
+{
+  return almacenarPosTerm;
+}
+
+// Devulve "directorioIndice"
+string
+IndexadorHash::DevolverDirIndice () const
+{
+  return directorioIndice;
+}
+
+// Devuelve el valor de "tipoStemmer"
+int
+IndexadorHash::DevolverTipoStemming () const
+{
+  return tipoStemmer;
+}
+
+// Devuekve el valor indicado en "almEnDisco"
+bool
+IndexadorHash::DevolverAlmEnDisco () const
+{
+  return almacenarEnDisco;
+}
+
+// Muestra por pantalla la información de la colección de documentos
+void
+IndexadorHash::ListarInfColeccDocs () const
+{
+  cout << informacionColeccionDocs.ToString() << endl;
+}
+
+// Muestra el contenido de "indice"
+void
+IndexadorHash::ListarTerminos () const
+{
+
+  for (unordered_map<string, InformacionTermino>::const_iterator pos = indice.cbegin();
+    pos != indice.cend(); pos++)
+  {
+    cout << pos->first << "\t" << pos->second << "\n";
+  }
+}
+
+/* Devuelve TRUE si el documento ha sido indexado y muestra por pantalla los términos
+    indexados del documento con ese nombre
+*/
+bool
+IndexadorHash::ListarTerminos (const string& nomDoc) const
+{
+  unordered_map<string, InfDoc>::const_iterator doc = indiceDocs.find(nomDoc);
+
+  if (doc != indiceDocs.cend())
+  { // Si el documento ha sido indexado
+    // Se buscan los términos indexados procendentes del mismo
+    long int id = doc->second.getIdDoc();
+    // Recupera todos los términos indexados que pertenezcan a ese documento
+    for (unordered_map<string, InformacionTermino>::const_iterator pos = indice.cbegin();
+      pos != indice.cend(); pos++)
+    {
+      if (pos->second.contieneEnDoc(id))
+      { // Si el término pertenece al documento, se añade a la cadena de salida
+        cout << pos->first << pos->second << "\n";
+      }
+    }
+    // Muestra el término y la información del término
+
+    return true;
+  }
+
+  return false;
+}
+
+// Muestra el contenido de "indiceDocs"
+void
+IndexadorHash::ListarDocs () const
+{
+  for (unordered_map<string, InfDoc>::const_iterator pos = indiceDocs.cbegin();
+    pos != indiceDocs.cend(); pos++)
+  {
+     cout << pos->first << "\t" << pos->second << "\n";
+  }
+}
+
+// Devuelve TRUE si el documento ha sido indexado, y muestra por pantalla el nombre y la información
+bool
+IndexadorHash::ListarDocs (const string& nomDoc) const
+{
+  unordered_map<string, InfDoc>::const_iterator doc = indiceDocs.find(nomDoc);
+
+  if (doc != indiceDocs.cend())
+  { // Si el documento ha sido indexado
+    // Se muestra su información
+    cout << nomDoc << "\t" << doc->second << "\n";
+
+    return true;
+  }
+
+  return false;
 }

@@ -1,8 +1,80 @@
-#include "../include/indexadorinformacion.h"
+#include "../include/indexadorInformacion.h"
+
+/**
+ * InformacionTermino
+ */
+
+ostream& operator<<(ostream& s, const InformacionTermino& p) {
+    s << "Frecuencia total: " << p.ftc << "\tfd: " << p.l_docs.size();
+    for (auto elem : p.l_docs)
+    {
+        s << "\t" << "Id.Doc: " << elem.first << "\t" << elem.second;
+    }
+
+    return s;
+}
+
+InformacionTermino
+&InformacionTermino::operator=(const InformacionTermino& aux){
+    if (this == &aux) {
+        return *this;
+    }else{
+        (*this).~InformacionTermino();
+
+        ftc = aux.ftc;
+        l_docs = aux.l_docs;
+
+        return *this;
+    }
+}
+
+InformacionTermino::InformacionTermino(const InformacionTermino& aux){
+    ftc = aux.ftc;
+    l_docs = aux.l_docs;
+}
+
+InformacionTermino::InformacionTermino ()
+{
+    ftc = 0;
+}
+
+InformacionTermino::~InformacionTermino(){
+    ftc = 0;
+    l_docs.clear();
+}
+
+void
+InformacionTermino::suprimirDocumento (const int& idDoc)
+{
+    auto posicion = l_docs.find(idDoc);
+    ftc = ftc - posicion->second.getFt();
+    l_docs.erase(idDoc);
+}
+
+void
+InformacionTermino::incrementarFrecuencia (const int& id, const int& posicion = 1)
+{
+    ftc++;
+    if (posicion == -1){
+        return;
+    }else{
+        auto insercionDoc = l_docs.insert(pair<int, InfTermDoc>(id, InfTermDoc())).first;
+        insercionDoc->second.aumentoFrecuencia(posicion);
+    }
+}
 
 /**
  * InfTermDoc
  */
+
+ostream& operator<<(ostream& s, const InfTermDoc& p) {
+    s << "ft: " << p.ft;
+    for (auto elem : p.posTerm)
+    {
+        s << "\t" << elem;
+    }
+    return s;
+}
 
 InfTermDoc::InfTermDoc(const InfTermDoc& aux){
     ft = aux.ft;
@@ -32,58 +104,16 @@ InfTermDoc
     }
 }
 
-ostream& operator<<(ostream& s, const InfTermDoc& p) {
-    s << "ft: " << p.ft;
-    /* A continuación se mostrarían todos los elementos de p.posTerm
-     * (“posicion TAB posicion TAB ... posicion,
-     * es decir nunca finalizará en un TAB”): s <<“\t“ << posicion;
-     * */
-    return s;
-}
-
-/**
- * InformacionTermino
- */
-
-InformacionTermino::InformacionTermino(const InformacionTermino& aux){
-    ftc = aux.ftc;
-    l_docs = aux.l_docs;
-}
-
-InformacionTermino::InformacionTermino(){
-    ftc = 0;
-}
-
-InformacionTermino::~InformacionTermino(){
-    ftc = 0;
-    l_docs.clear();
-}
-
-InformacionTermino
-&InformacionTermino::operator=(const InformacionTermino& aux){
-    if (this == &aux) {
-        return *this;
-    }else{
-        (*this).~InformacionTermino();
-
-        ftc = aux.ftc;
-        l_docs = aux.l_docs;
-
-        return *this;
-    }
-}
-
-ostream& operator<<(ostream& s, const InformacionTermino& p) {
-    s << "Frecuencia total: " << p.ftc << "\tfd: " << p.l_docs.size();
-    /* A continuación se mostrarían todos los elementos de p.l_docs: s <<
-     * “\tId.Doc: “ << idDoc << “\t” << InfTermDoc;
-     * */
-    return s;
-}
-
 /**
  * InfDoc
  */
+
+ostream& operator<<(ostream& s, const InfDoc& p) {
+    s << "idDoc: " << p.idDoc << "\t" << "numPal: " << p.numPal <<
+      "\t" << "numPalSinParada: " << p.numPalSinParada << "\t" << "numPalDiferentes: " <<
+      p.numPalDiferentes << "\t" <<"tamBytes: " << p.tamBytes;
+    return s;
+}
 
 InfDoc::InfDoc(const InfDoc& aux) {
     fechaModificacion = aux.fechaModificacion;
@@ -94,13 +124,14 @@ InfDoc::InfDoc(const InfDoc& aux) {
     tamBytes = aux.tamBytes;
 }
 
-InfDoc::InfDoc(time_t auxFechaModificacion,int auxNumPalDiferentres, int auxTamBytes, int auxNumPalSinParada,int auxIdDoc ,int auxNumPal){
-    fechaModificacion = auxFechaModificacion;
-    this->numPal = auxNumPal;
-    this->idDoc = auxIdDoc;
-    this->numPalSinParada = auxNumPalSinParada;
-    this->numPalDiferentes = auxNumPalDiferentres;
-    this->tamBytes = auxTamBytes;
+InfDoc::InfDoc (int& aux)
+{
+    fechaModificacion = time(0);
+    numPal = 0;
+    idDoc = aux;
+    numPalSinParada = 0;
+    numPalDiferentes = 0;
+    tamBytes = 0;
 }
 
 InfDoc::InfDoc(){
@@ -121,6 +152,7 @@ InfDoc::~InfDoc(){
     tamBytes = 0;
 }
 
+
 InfDoc
 &InfDoc::operator=(const InfDoc& aux){
     if (this == &aux) {
@@ -139,17 +171,22 @@ InfDoc
     }
 }
 
-ostream& operator<<(ostream& s, const InfDoc& p) {
-    s << "idDoc: " << p.idDoc << "\tnumPal: " << p.numPal <<
-      "\tnumPalSinParada: " << p.numPalSinParada << "\tnumPalDiferentes: " <<
-      p.numPalDiferentes << "\ttamBytes: " << p.tamBytes;
-    return s;
-}
-
 /**
  * InfColeccionDocs
  */
 
+ostream& operator<< (ostream& s, const InfColeccionDocs& p)
+{
+    s << p.ToString();
+
+    return s;
+}
+
+string
+InfColeccionDocs::ToString () const
+{
+    return  "numDocs: " + to_string(numDocs) + "\tnumTotalPal: " + to_string(numTotalPal) + "\tnumTotalPalSinParada: " + to_string(numTotalPalSinParada) + "\tnumTotalPalDiferentes: " + to_string(numTotalPalDiferentes) + "\ttamBytes: " + to_string(tamBytes);
+}
 
 InfColeccionDocs::InfColeccionDocs(const InfColeccionDocs& aux) {
     tamBytes = aux.tamBytes;
@@ -160,14 +197,6 @@ InfColeccionDocs::InfColeccionDocs(const InfColeccionDocs& aux) {
 
 }
 
-InfColeccionDocs::InfColeccionDocs(int auxNumTotalPalDiferentes, int auxTamBytes, int auxNumTotalPalSinParada,int auxNumDocs ,int auxNumTotalPal){
-    tamBytes = auxTamBytes;
-    numTotalPalSinParada = auxNumTotalPalSinParada;
-    numTotalPalDiferentes = auxNumTotalPalDiferentes;
-    numTotalPal = auxNumTotalPal;
-    numDocs = auxNumDocs;
-}
-
 InfColeccionDocs::InfColeccionDocs(){
     tamBytes = 0;
     numTotalPalSinParada = 0;
@@ -175,6 +204,7 @@ InfColeccionDocs::InfColeccionDocs(){
     numTotalPal = 0;
     numDocs = 0;
 }
+
 
 InfColeccionDocs::~InfColeccionDocs(){
     tamBytes = 0;
@@ -201,17 +231,17 @@ InfColeccionDocs
     }
 }
 
-ostream& operator<<(ostream& s, const InfColeccionDocs& p){
-    s << "numDocs: " << p.numDocs << "\tnumTotalPal: " << p.numTotalPal <<
-      "\tnumTotalPalSinParada: " << p.numTotalPalSinParada <<
-      "\tnumTotalPalDiferentes: " << p.numTotalPalDiferentes << "\ttamBytes: " <<
-      p.tamBytes;
-    return s;
-}
-
 /**
 * InformacionTerminoPregunta
 */
+
+ostream& operator<<(ostream& s, const InformacionTerminoPregunta& p) {
+    s << "ft: " << p.ft;
+    for(auto elem : p.posTerm){
+        s << "\t" << elem;
+    }
+    return s;
+}
 
 InformacionTerminoPregunta::InformacionTerminoPregunta(const InformacionTerminoPregunta& aux) {
     ft = aux.ft;
@@ -241,17 +271,15 @@ InformacionTerminoPregunta
     }
 }
 
-ostream& operator<<(ostream& s, const InformacionTerminoPregunta& p) {
-    s << "ft: " << p.ft;
-    // A continuación se mostrarían todos los elementos de p.posTerm (“posicion
-    // TAB posicion TAB ... posicion, es decir nunca finalizará en un TAB”): s <<
-    // “\t“ << posicion;
-    return s;
-}
-
 /**
 * InformacionPregunta
 */
+
+ostream& operator<<(ostream& s, const InformacionPregunta& p){
+    s << "numTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: "<<
+      p.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << p.numTotalPalDiferentes;
+    return s;
+}
 
 InformacionPregunta::InformacionPregunta(const InformacionPregunta& aux) {
     numTotalPalSinParada = aux.numTotalPalSinParada;
@@ -285,10 +313,4 @@ InformacionPregunta
 
         return *this;
     }
-}
-
-ostream& operator<<(ostream& s, const InformacionPregunta& p){
-    s << "numTotalPal: " << p.numTotalPal << "\tnumTotalPalSinParada: "<<
-      p.numTotalPalSinParada << "\tnumTotalPalDiferentes: " << p.numTotalPalDiferentes;
-    return s;
 }
