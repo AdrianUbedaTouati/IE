@@ -57,22 +57,6 @@ private:
 
     void ficheroTratar (const string&, const unordered_map<string, InfDoc>::iterator&);
 
-    bool obtenerInformacionDocsIndexar (const string&, list<string>&) const;
-
-    bool almacenarStopWords ();
-
-    void soloStemming(string& palabra) const;
-
-    bool cargarDocsAindexar (const string& ficheroDocumentos, list<string>& listaDocs) const;
-
-    void reindexarDocumento (const string& nombreDoc, const unordered_map<string, InfDoc>::iterator& itDoc, const off_t& tamB, const time_t& fMod);
-
-    //void ficheroTratar (const string& nombreDoc, const unordered_map<string, InfDoc>::iterator& itDoc);
-
-
-
-
-
     list<string>  recogerTokens (const string& nombre, const unordered_map<string, InfDoc>::iterator& mapaDoc);
 
 public:
@@ -80,8 +64,6 @@ public:
       const string&, const int&, const bool&, const bool&);
 
     IndexadorHash (const string& directorioIndexacion);
-
-
 
     IndexadorHash (const IndexadorHash&);
 
