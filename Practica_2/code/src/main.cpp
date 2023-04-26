@@ -54,6 +54,3 @@ main(void)
         cout << "pal7 NO SE HA INDEXADO" << endl;
 
 }
-
-
-
